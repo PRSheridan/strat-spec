@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 
 function Explore () {
     const navigate = useNavigate()
-    const [catalogue, setCatalogue] = useState([])
+    const [catalogue, setCatalogue] = useState<any[]>([])
     return (
         <>
             <div>User Submissions</div>
