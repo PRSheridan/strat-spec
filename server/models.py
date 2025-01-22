@@ -1,70 +1,107 @@
+from sqlalchemy_serializer import SerializerMixin
+from sqlalchemy.orm import validates
+from sqlalchemy.ext.hybrid import hybrid_property
+from config import db, bcrypt
+
+
+# User Model
+class User(db.Model, SerializerMixin):
+    __tablename__ = 'user'
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), unique=True, nullable=False)
+    email = db.Column(db.String(128), nullable=False)
+    _password_hash = db.Column(db.String(128), nullable=False)
+    role = db.Column(db.String(32), nullable=False)
+
+    # Relationships
+    guitars = db.relationship('Guitar', secondary='user_guitars', back_populates='users', cascade='all, delete-orphan')
+
+    @validates('role')
+    def validate_role(self, key, role):
+        if role not in ['client', 'admin']:
+            raise ValueError("Role must be either 'client' or 'admin'.")
+        return role
+
+    @hybrid_property
+    def password_hash(self):
+        raise AttributeError('Password hashes cannot be viewed.')
+
+    @password_hash.setter
+    def password_hash(self, password):
+        password_hash = bcrypt.generate_password_hash(password.encode('utf-8'))
+        self._password_hash = password_hash.decode('utf-8')
+
+    def authenticate(self, password):
+        return bcrypt.check_password_hash(self._password_hash, password.encode('utf-8'))
+
+    def __repr__(self):
+        return f'<User {self.id}, {self.username}>'
+
+
+# Image Model
+class Image(db.Model, SerializerMixin):
+    __tablename__ = 'image'
+
+    serialize_rules = ('-ticket',)  # Omit ticket to prevent recursion
+
+    id = db.Column(db.Integer, primary_key=True)
+    file_path = db.Column(db.String, nullable=False)
+    guitar_id = db.Column(db.Integer, db.ForeignKey('guitar.id'), nullable=False)
+
+    # Relationships
+    guitar = db.relationship('Guitar', back_populates='images')
+
+
 # Guitar Model
-import db, SerializerMixin
-
 class Guitar(db.Model, SerializerMixin):
-    __tablename__ = 'guitars'
-
-    serialize_rules = (
-        '-model',  # Omit model to prevent recursion
-    )
+    __tablename__ = 'guitar'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=True)
     serial_number = db.Column(db.String, nullable=True)
-    model_id = db.Column(db.Integer, db.ForeignKey('models.id'), nullable=False)
 
     # Relationships
     model = db.relationship('Model', back_populates='guitars')
+    users = db.relationship('User', secondary='user_guitars', back_populates='guitars')
+    images = db.relationship('Image', back_populates='guitar', cascade='all, delete-orphan')
 
 
-# Model
 class Model(db.Model, SerializerMixin):
-    __tablename__ = 'models'
+    __tablename__ = 'model'
 
-    serialize_rules = (
-        '-guitars',  # Omit guitars to prevent recursion
-    )
+    serialize_rules = ('-body.model', '-neck_shape.model', '-fretboard.model', '-nut.model',
+                       '-truss_rod.model', '-pickups.model', '-bridge.model', '-tuning_machine.model',
+                       '-string_tree.model', '-pickguard.model', '-control_knob.model', '-switch_tip.model',
+                       '-neck_plate.model')
 
     id = db.Column(db.Integer, primary_key=True)
-    model_name = db.Column(db.String, nullable=False)
-    year_range = db.Column(db.String, nullable=True)
-    body_id = db.Column(db.Integer, db.ForeignKey('bodies.id'), nullable=False)
-    neck_shape_id = db.Column(db.Integer, db.ForeignKey('neck_shapes.id'), nullable=False)
-    neck_wood = db.Column(db.String, nullable=False)
-    neck_finish_id = db.Column(db.Integer, db.ForeignKey('finishes.id'), nullable=False)
-    fretboard_material_id = db.Column(db.Integer, db.ForeignKey('fretboard_materials.id'), nullable=False)
-    fretboard_radius = db.Column(db.Float, nullable=False)
-    fret_size = db.Column(db.String, nullable=False)
-    number_of_frets = db.Column(db.Integer, nullable=False)
-    nut_material_id = db.Column(db.Integer, db.ForeignKey('nut_materials.id'), nullable=False)
-    nut_width = db.Column(db.Float, nullable=False)
-    truss_rod_type_id = db.Column(db.Integer, db.ForeignKey('truss_rods.id'), nullable=False)
-    truss_rod_location = db.Column(db.String, nullable=False)
-    pickup_configuration_id = db.Column(db.Integer, db.ForeignKey('configurations.id'), nullable=False)
-    pickup_1_id = db.Column(db.Integer, db.ForeignKey('pickups.id'), nullable=False)
-    pickup_2_id = db.Column(db.Integer, db.ForeignKey('pickups.id'), nullable=False)
-    pickup_3_id = db.Column(db.Integer, db.ForeignKey('pickups.id'), nullable=True)
-    bridge_type_id = db.Column(db.Integer, db.ForeignKey('bridges.id'), nullable=False)
-    saddle_type_id = db.Column(db.Integer, db.ForeignKey('saddles.id'), nullable=False)
-    tuning_machine_type_id = db.Column(db.Integer, db.ForeignKey('tuning_machines.id'), nullable=False)
-    string_tree_type_id = db.Column(db.Integer, db.ForeignKey('string_trees.id'), nullable=False)
-    pickguard_style_id = db.Column(db.Integer, db.ForeignKey('pickguards.id'), nullable=False)
-    control_knob_style_id = db.Column(db.Integer, db.ForeignKey('control_knobs.id'), nullable=False)
-    switch_tip_style_id = db.Column(db.Integer, db.ForeignKey('switch_tips.id'), nullable=False)
-    neck_plate_design_id = db.Column(db.Integer, db.ForeignKey('neck_plates.id'), nullable=False)
-    finish_id = db.Column(db.Integer, db.ForeignKey('finishes.id'), nullable=False)
-    color_id = db.Column(db.Integer, db.ForeignKey('colors.id'), nullable=False)
+    name = db.Column(db.String, nullable=False)
+    years = db.Column(db.String, nullable=True)
+
+    body_id = db.Column(db.Integer, db.ForeignKey('body.id'), nullable=False)
+    neck_id = db.Column(db.Integer, db.ForeignKey('neck.id'), nullable=False)
+    fretboard_id = db.Column(db.Integer, db.ForeignKey('fretboard.id'), nullable=False)
+    nut_id = db.Column(db.Integer, db.ForeignKey('nut.id'), nullable=False)
+    truss_rod_id = db.Column(db.Integer, db.ForeignKey('truss_rod.id'), nullable=False)
+    pickups_id = db.Column(db.Integer, db.ForeignKey('pickups.id'), nullable=False)
+    bridge_id = db.Column(db.Integer, db.ForeignKey('bridge.id'), nullable=False)
+    tuning_machine_id = db.Column(db.Integer, db.ForeignKey('tuning_machine.id'), nullable=False)
+    string_tree_id = db.Column(db.Integer, db.ForeignKey('string_tree.id'), nullable=False)
+    pickguard_id = db.Column(db.Integer, db.ForeignKey('pickguard.id'), nullable=False)
+    control_knob_id = db.Column(db.Integer, db.ForeignKey('control_knob.id'), nullable=False)
+    switch_tip_id = db.Column(db.Integer, db.ForeignKey('switch_tip.id'), nullable=False)
+    neck_plate_id = db.Column(db.Integer, db.ForeignKey('neck_plate.id'), nullable=False)
 
     # Relationships
     body = db.relationship('Body', back_populates='models')
-    neck_shape = db.relationship('NeckShape', back_populates='models')
-    finish = db.relationship('Finish', back_populates='models')
-    color = db.relationship('Color', back_populates='models')
-    pickups = db.relationship('Pickup', back_populates='model')
-    configurations = db.relationship('Configuration', back_populates='model')
+    neck = db.relationship('Neck', back_populates='models')
+    fretboard = db.relationship('Fretboard', back_populates='models')
+    nut = db.relationship('Nut', back_populates='models')
+    truss_rod = db.relationship('TrussRod', back_populates='models')
+    pickups = db.relationship('Pickups', back_populates='models')
     bridges = db.relationship('Bridge', back_populates='models')
-    saddles = db.relationship('Saddle', back_populates='models')
     tuning_machines = db.relationship('TuningMachine', back_populates='models')
     string_trees = db.relationship('StringTree', back_populates='models')
     pickguards = db.relationship('Pickguard', back_populates='models')
@@ -73,65 +110,63 @@ class Model(db.Model, SerializerMixin):
     neck_plates = db.relationship('NeckPlate', back_populates='models')
 
 
-# Body
+# Body Model
 class Body(db.Model, SerializerMixin):
-    __tablename__ = 'bodies'
+    __tablename__ = 'body'
 
-    serialize_rules = (
-        '-models',  # Omit models to prevent recursion
-    )
+    serialize_rules = ('-models',)
 
     id = db.Column(db.Integer, primary_key=True)
     body_type = db.Column(db.String, nullable=False)
     body_wood = db.Column(db.String, nullable=False)
+    color = db.Column(db.String, nullable=False)
+    finish_type = db.Column(db.String, nullable=False)
 
     # Relationships
     models = db.relationship('Model', back_populates='body')
 
 
-# NeckShape
-class NeckShape(db.Model, SerializerMixin):
-    __tablename__ = 'neck_shapes'
+# Neck Model
+class Neck(db.Model, SerializerMixin):
+    __tablename__ = 'neck'
 
-    serialize_rules = (
-        '-models',  # Omit models to prevent recursion
-    )
+    serialize_rules = ('-models',)
 
     id = db.Column(db.Integer, primary_key=True)
-    shape_name = db.Column(db.String, nullable=False)
-    neck_wood = db.Column(db.String, nullable=False)
-    neck_finish_id = db.Column(db.Integer, db.ForeignKey('finishes.id'), nullable=False)
+    shape = db.Column(db.String, nullable=False)
+    wood = db.Column(db.String, nullable=False)
+    finish = db.Column(db.String, nullable=False)
 
     # Relationships
-    finish = db.relationship('Finish', back_populates='neck_shapes')
-    models = db.relationship('Model', back_populates='neck_shape')
+    models = db.relationship('Model', back_populates='neck')
 
 
-# FretboardMaterial
-class FretboardMaterial(db.Model, SerializerMixin):
-    __tablename__ = 'fretboard_materials'
+# Fretboard Model
+class Fretboard(db.Model, SerializerMixin):
+    __tablename__ = 'fretboard'
 
     id = db.Column(db.Integer, primary_key=True)
-    material_name = db.Column(db.String, nullable=False)
+    material = db.Column(db.String, nullable=False)
+    radius = db.Column(db.String, nullable=False)
 
     # Relationships
-    models = db.relationship('Model', back_populates='fretboard_material')
+    models = db.relationship('Model', back_populates='fretboard')
 
 
-# NutMaterial
-class NutMaterial(db.Model, SerializerMixin):
-    __tablename__ = 'nut_materials'
+# Nut Model
+class Nut(db.Model, SerializerMixin):
+    __tablename__ = 'nut'
 
     id = db.Column(db.Integer, primary_key=True)
-    material_name = db.Column(db.String, nullable=False)
+    material = db.Column(db.String, nullable=False)
 
     # Relationships
-    models = db.relationship('Model', back_populates='nut_material')
+    models = db.relationship('Model', back_populates='nut')
 
 
-# TrussRod
+# TrussRod Model
 class TrussRod(db.Model, SerializerMixin):
-    __tablename__ = 'truss_rods'
+    __tablename__ = 'truss_rod'
 
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String, nullable=False)
@@ -141,33 +176,20 @@ class TrussRod(db.Model, SerializerMixin):
     models = db.relationship('Model', back_populates='truss_rod')
 
 
-# Pickup
-class Pickup(db.Model, SerializerMixin):
+# Pickups Model
+class Pickups(db.Model, SerializerMixin):
     __tablename__ = 'pickups'
-
-    id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String, nullable=False)
-    name = db.Column(db.String, nullable=False)
-    position = db.Column(db.String, nullable=False)
-
-    # Relationships
-    models = db.relationship('Model', back_populates='pickups')
-
-
-# Configuration
-class Configuration(db.Model, SerializerMixin):
-    __tablename__ = 'configurations'
 
     id = db.Column(db.Integer, primary_key=True)
     pickup_configuration = db.Column(db.String, nullable=False)
 
     # Relationships
-    models = db.relationship('Model', back_populates='configurations')
+    models = db.relationship('Model', back_populates='pickups')
 
 
-# Bridge
+# Bridge Model
 class Bridge(db.Model, SerializerMixin):
-    __tablename__ = 'bridges'
+    __tablename__ = 'bridge'
 
     id = db.Column(db.Integer, primary_key=True)
     bridge_type = db.Column(db.String, nullable=False)
@@ -176,20 +198,9 @@ class Bridge(db.Model, SerializerMixin):
     models = db.relationship('Model', back_populates='bridges')
 
 
-# Saddle
-class Saddle(db.Model, SerializerMixin):
-    __tablename__ = 'saddles'
-
-    id = db.Column(db.Integer, primary_key=True)
-    saddle_type = db.Column(db.String, nullable=False)
-
-    # Relationships
-    models = db.relationship('Model', back_populates='saddles')
-
-
-# TuningMachine
+# TuningMachine Model
 class TuningMachine(db.Model, SerializerMixin):
-    __tablename__ = 'tuning_machines'
+    __tablename__ = 'tuning_machine'
 
     id = db.Column(db.Integer, primary_key=True)
     machine_type = db.Column(db.String, nullable=False)
@@ -198,9 +209,9 @@ class TuningMachine(db.Model, SerializerMixin):
     models = db.relationship('Model', back_populates='tuning_machines')
 
 
-# StringTree
+# StringTree Model
 class StringTree(db.Model, SerializerMixin):
-    __tablename__ = 'string_trees'
+    __tablename__ = 'string_tree'
 
     id = db.Column(db.Integer, primary_key=True)
     tree_type = db.Column(db.String, nullable=False)
@@ -209,20 +220,21 @@ class StringTree(db.Model, SerializerMixin):
     models = db.relationship('Model', back_populates='string_trees')
 
 
-# Pickguard
+# Pickguard Model
 class Pickguard(db.Model, SerializerMixin):
-    __tablename__ = 'pickguards'
+    __tablename__ = 'pickguard'
 
     id = db.Column(db.Integer, primary_key=True)
-    style = db.Column(db.String, nullable=False)
+    layers = db.Column(db.String, nullable=False)
+    color = db.Column(db.String, nullable=False)
 
     # Relationships
     models = db.relationship('Model', back_populates='pickguards')
 
 
-# ControlKnob
+# ControlKnob Model
 class ControlKnob(db.Model, SerializerMixin):
-    __tablename__ = 'control_knobs'
+    __tablename__ = 'control_knob'
 
     id = db.Column(db.Integer, primary_key=True)
     style = db.Column(db.String, nullable=False)
@@ -231,9 +243,9 @@ class ControlKnob(db.Model, SerializerMixin):
     models = db.relationship('Model', back_populates='control_knobs')
 
 
-# SwitchTip
+# SwitchTip Model
 class SwitchTip(db.Model, SerializerMixin):
-    __tablename__ = 'switch_tips'
+    __tablename__ = 'switch_tip'
 
     id = db.Column(db.Integer, primary_key=True)
     style = db.Column(db.String, nullable=False)
@@ -242,21 +254,19 @@ class SwitchTip(db.Model, SerializerMixin):
     models = db.relationship('Model', back_populates='switch_tips')
 
 
-# NeckPlate
+# NeckPlate Model
 class NeckPlate(db.Model, SerializerMixin):
-    __tablename__ = 'neck_plates'
+    __tablename__ = 'neck_plate'
 
     id = db.Column(db.Integer, primary_key=True)
-    design = db.Column(db.String, nullable=False)
+    style = db.Column(db.String, nullable=False)
 
     # Relationships
     models = db.relationship('Model', back_populates='neck_plates')
 
 
-# Finish
-class Finish(db.Model, SerializerMixin):
-    __tablename__ = 'finishes'
-
-    id = db.Column(db.Integer, primary_key=True)
-    finish_type = db.Column(db.String, nullable=False)
-
+# Association Table for User-Guitar relationship
+user_guitars = db.Table('user_guitars',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('guitar_id', db.Integer, db.ForeignKey('guitar.id'), primary_key=True)
+)
