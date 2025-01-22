@@ -11,11 +11,11 @@ class User(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
     email = db.Column(db.String(128), nullable=False)
-    _password_hash = db.Column(db.String(128), nullable=False)
+    #_password_hash = db.Column(db.String(128), nullable=False)
     role = db.Column(db.String(32), nullable=False)
 
     # Relationships
-    guitars = db.relationship('Guitar', secondary='user_guitars', back_populates='users', cascade='all, delete-orphan')
+    guitars = db.relationship('Guitar', backref='owner', cascade='all, delete-orphan')
 
     @validates('role')
     def validate_role(self, key, role):
@@ -23,17 +23,17 @@ class User(db.Model, SerializerMixin):
             raise ValueError("Role must be either 'client' or 'admin'.")
         return role
 
-    @hybrid_property
-    def password_hash(self):
-        raise AttributeError('Password hashes cannot be viewed.')
+    #@hybrid_property
+    #def password_hash(self):
+    #    raise AttributeError('Password hashes cannot be viewed.')
 
-    @password_hash.setter
-    def password_hash(self, password):
-        password_hash = bcrypt.generate_password_hash(password.encode('utf-8'))
-        self._password_hash = password_hash.decode('utf-8')
+    #@password_hash.setter
+    #def password_hash(self, password):
+    #    password_hash = bcrypt.generate_password_hash(password.encode('utf-8'))
+    #    self._password_hash = password_hash.decode('utf-8')
 
-    def authenticate(self, password):
-        return bcrypt.check_password_hash(self._password_hash, password.encode('utf-8'))
+    #def authenticate(self, password):
+    #    return bcrypt.check_password_hash(self._password_hash, password.encode('utf-8'))
 
     def __repr__(self):
         return f'<User {self.id}, {self.username}>'
@@ -60,14 +60,17 @@ class Guitar(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=True)
-    serial_number = db.Column(db.String, nullable=True)
+    serial_number = db.Column(db.String, unique=True, nullable=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    model_id = db.Column(db.Integer, db.ForeignKey('model.id'), nullable=False)  # Foreign key to Model
 
     # Relationships
-    model = db.relationship('Model', back_populates='guitars')
-    users = db.relationship('User', secondary='user_guitars', back_populates='guitars')
+    model = db.relationship('Model', back_populates='guitars')  # Many-to-one relationship (Guitar -> Model)
     images = db.relationship('Image', back_populates='guitar', cascade='all, delete-orphan')
 
 
+# Model Model
 class Model(db.Model, SerializerMixin):
     __tablename__ = 'model'
 
@@ -108,6 +111,8 @@ class Model(db.Model, SerializerMixin):
     control_knobs = db.relationship('ControlKnob', back_populates='models')
     switch_tips = db.relationship('SwitchTip', back_populates='models')
     neck_plates = db.relationship('NeckPlate', back_populates='models')
+
+    guitars = db.relationship('Guitar', back_populates='model')  # One-to-many relationship (Model -> Guitars)
 
 
 # Body Model
@@ -263,10 +268,3 @@ class NeckPlate(db.Model, SerializerMixin):
 
     # Relationships
     models = db.relationship('Model', back_populates='neck_plates')
-
-
-# Association Table for User-Guitar relationship
-user_guitars = db.Table('user_guitars',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('guitar_id', db.Integer, db.ForeignKey('guitar.id'), primary_key=True)
-)
