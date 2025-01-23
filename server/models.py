@@ -63,10 +63,11 @@ class Guitar(db.Model, SerializerMixin):
     serial_number = db.Column(db.String, unique=True, nullable=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    model_id = db.Column(db.Integer, db.ForeignKey('model.id'), nullable=False)  # Foreign key to Model
+    model_id = db.Column(db.Integer, db.ForeignKey('model.id'), nullable=False) 
 
     # Relationships
-    model = db.relationship('Model', back_populates='guitars')  # Many-to-one relationship (Guitar -> Model)
+    user = db.relationship('User', back_populates='guitars')
+    model = db.relationship('Model', back_populates='guitars')
     images = db.relationship('Image', back_populates='guitar', cascade='all, delete-orphan')
 
 
@@ -114,6 +115,7 @@ class Model(db.Model, SerializerMixin):
 
     guitars = db.relationship('Guitar', back_populates='model')  # One-to-many relationship (Model -> Guitars)
 
+#Guitar Attributes (no specific methods to search yet)
 
 # Body Model
 class Body(db.Model, SerializerMixin):
