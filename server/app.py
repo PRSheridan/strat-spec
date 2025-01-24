@@ -13,13 +13,64 @@ def index():
 #outline of needed classes and methods. Will make many many methods for the search model. 
 #last project used frontend for filtering... not good.
 
-#check session
+class CheckSession(Resource):
+    def get(self):
+        if session['user_id']:
+            user = User.query.filter(User.id == session['user_id']).first().to_dict()
+            return user, 200
+        
+        return {'error': '401 Unauthorized Request'}, 401
 
-#signup
+class Signup(Resource):
+    def post(self):
+        data = request.get_json()
 
-#login
+        username = data.get('username')
+        password = data.get('password')
+        email = data.get('email')
+        role = "client"
+        passwordConfirm = data.get('passwordConfirm')
 
-#logout
+        if password != passwordConfirm:
+            return {'error': '400 Passwords do not match'}, 400
+
+        try:
+            user = User(
+                username = username,
+                email = email,
+                role=role
+            )
+            
+            user.password_hash = password
+
+            db.session.add(user)
+            db.session.commit()
+            session['user_id'] = user.id
+            return user.to_dict(), 201
+        
+        except Exception as e:
+            return {'error': str(e)}, 402
+        
+class Login(Resource):
+    def post(self):
+        json = request.get_json()
+        username = json.get('username')
+        password = json.get('password')
+        user = User.query.filter(User.username == username).first()
+
+        if user and user.authenticate(password):
+            session['user_id'] = user.id
+            return make_response(user.to_dict(), 200)
+        
+        return {'error': '401 Unauthorized login'}, 401
+    
+class Logout(Resource):
+    def delete(self):
+        if session['user_id']:
+            session['user_id'] = ''
+            return {}, 204
+        
+        return {'error':'401 Unable to process request'}, 401
 
 #Users: list of all users
 class Users(Resource):
@@ -92,40 +143,41 @@ class GuitarByID(Resource):
         if not (guitar := Guitar.query.filter_by(id=guitar_id).one_or_none()):
             return {'error': 'Guitar not found'}, 404
         
+        user = User.query.filter_by(id=data.get('user_id')).one_or_none()
+        if not user:
+            return {'error': 'User not found'}, 404
+
+        model = Model.query.filter_by(id=data.get('model_id')).one_or_none()
+        if not model:
+            return {'error': 'Model not found'}, 404
+        
+        serial_number = Guitar.query.filter_by(id=data.get('serial_number')).one_or_none()
+        if serial_number:
+            return {'error': 'Serial number already exists'}, 404
+        
         data = request.get_json()
         try:
-            guitar.requestor_id = data.get('requestor_id', ticket.requestor_id)
-            ticket.email = data.get('email', ticket.email)
-            ticket.phone = data.get('phone', ticket.phone)
-            ticket.title = data.get('title', ticket.title)
-            ticket.description = data.get('description', ticket.description)
-            ticket.priority = data.get('priority', ticket.priority)
-            ticket.status = data.get('status', ticket.status)
+            guitar.name = data.get('name', guitar.name),
+            guitar.data.get('description', guitar.description),
+            guitar.data.get('serial_number', guitar.serial_number),
+            guitar.user_id=data.get('user_id', guitar.user_id),
+            guitar.model_id=data.get('model.id', guitar.model_id)
             db.session.commit()
-            return ticket.to_dict(), 200
+            return guitar.to_dict(), 200
 
         except Exception as e:
             print(str(e)) 
             return {'error': str(e)}, 400
 
-    def delete(self, ticket_id):
-        ticket = Ticket.query.filter(Ticket.id == ticket_id).one_or_none()
-        if ticket is None:
-            return {'error': 'Ticket not found'}, 404
+    def delete(self, guitar_id):
+        if not (guitar := Guitar.query.filter_by(id=guitar_id).one_or_none()):
+            return {'error': 'Guitar not found'}, 404
         
-        for image in ticket.images:
-            file_path = os.path.join(app.config["UPLOAD_PATH"], image.file_path)
-            if os.path.exists(file_path):
-                try:
-                    os.remove(file_path)
-                except OSError as e:
-                    return {'error': f'Error deleting file: {e}'}, 500
+        #removed image handling for now
 
-        db.session.delete(ticket)
+        db.session.delete(guitar)
         db.session.commit()
         return '', 204
-
-#guitar (by ID)
 
 #models (all)
 
