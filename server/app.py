@@ -40,7 +40,7 @@ class Signup(Resource):
                 email = email,
                 role=role
             )
-            
+
             user.password_hash = password
 
             db.session.add(user)
@@ -180,10 +180,35 @@ class GuitarByID(Resource):
         return '', 204
 
 #models (all)
+class Models(Resource):
+    def get(self):    
+        return [models.to_dict() for models in Models.query.all()], 200
+    
+    def post(self):
+        data = request.get_json()
+
+        try:
+            new_model = Model(
+                name=data.get('name'),
+                years=data.get('years'),
+                #need to figure out how to add attributes smoothly.
+                #by ID? need to search each model for cooresponding ID?
+                #should I modify the Model? is ID tied to dropdowns/searching?
+            )
+
+            db.session.add(new_model)
+            db.session.commit()
+
+            return new_model.to_dict(), 201
+        
+        #look into rollback function
+        except Exception as e:
+            db.session.rollback()
+            return {'error': str(e)}, 400
 
 #models (by ID)
 
-#models (by year, wood, pickups fretboard...)
+#models (by given data: could be many)
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
