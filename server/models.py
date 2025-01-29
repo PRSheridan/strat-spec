@@ -15,7 +15,7 @@ class User(db.Model, SerializerMixin):
     role = db.Column(db.String(32), nullable=False)
 
     # Relationships
-    guitars = db.relationship('Guitar', backref='owner', cascade='all, delete-orphan')
+    guitars = db.relationship('Guitar', back_populates='user')
 
     @validates('role')
     def validate_role(self, key, role):
@@ -37,20 +37,6 @@ class User(db.Model, SerializerMixin):
 
     def __repr__(self):
         return f'<User {self.id}, {self.username}>'
-
-
-# Image Model
-class Image(db.Model, SerializerMixin):
-    __tablename__ = 'image'
-
-    serialize_rules = ('-ticket',)  # Omit ticket to prevent recursion
-
-    id = db.Column(db.Integer, primary_key=True)
-    file_path = db.Column(db.String, nullable=False)
-    guitar_id = db.Column(db.Integer, db.ForeignKey('guitar.id'), nullable=False)
-
-    # Relationships
-    guitar = db.relationship('Guitar', back_populates='images')
 
 
 # Guitar Model
@@ -75,7 +61,7 @@ class Guitar(db.Model, SerializerMixin):
 class Model(db.Model, SerializerMixin):
     __tablename__ = 'model'
 
-    serialize_rules = ('-body.model', '-neck_shape.model', '-fretboard.model', '-nut.model',
+    serialize_rules = ('-body.model', '-neck.model', '-fretboard.model', '-nut.model',
                        '-truss_rod.model', '-pickups.model', '-bridge.model', '-tuning_machine.model',
                        '-string_tree.model', '-pickguard.model', '-control_knob.model', '-switch_tip.model',
                        '-neck_plate.model')
@@ -105,17 +91,30 @@ class Model(db.Model, SerializerMixin):
     nut = db.relationship('Nut', back_populates='models')
     truss_rod = db.relationship('TrussRod', back_populates='models')
     pickups = db.relationship('Pickups', back_populates='models')
-    bridges = db.relationship('Bridge', back_populates='models')
-    tuning_machines = db.relationship('TuningMachine', back_populates='models')
-    string_trees = db.relationship('StringTree', back_populates='models')
-    pickguards = db.relationship('Pickguard', back_populates='models')
-    control_knobs = db.relationship('ControlKnob', back_populates='models')
-    switch_tips = db.relationship('SwitchTip', back_populates='models')
-    neck_plates = db.relationship('NeckPlate', back_populates='models')
+    bridge = db.relationship('Bridge', back_populates='models')
+    tuning_machine = db.relationship('TuningMachine', back_populates='models')
+    string_tree = db.relationship('StringTree', back_populates='models')
+    pickguard = db.relationship('Pickguard', back_populates='models')
+    control_knob = db.relationship('ControlKnob', back_populates='models')
+    switch_tip = db.relationship('SwitchTip', back_populates='models')
+    neck_plate = db.relationship('NeckPlate', back_populates='models')
 
     guitars = db.relationship('Guitar', back_populates='model')  # One-to-many relationship (Model -> Guitars)
 
 #Guitar Attributes (no specific methods to search yet)
+
+# Image Model
+class Image(db.Model, SerializerMixin):
+    __tablename__ = 'image'
+
+    serialize_rules = ('-ticket',)  # Omit ticket to prevent recursion
+
+    id = db.Column(db.Integer, primary_key=True)
+    file_path = db.Column(db.String, nullable=False)
+    guitar_id = db.Column(db.Integer, db.ForeignKey('guitar.id'), nullable=False)
+
+    # Relationships
+    guitar = db.relationship('Guitar', back_populates='images')
 
 # Body Model
 class Body(db.Model, SerializerMixin):
@@ -155,6 +154,7 @@ class Fretboard(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     material = db.Column(db.String, nullable=False)
     radius = db.Column(db.String, nullable=False)
+    frets = db.Column(db.String, nullable=False)
 
     # Relationships
     models = db.relationship('Model', back_populates='fretboard')
@@ -202,7 +202,7 @@ class Bridge(db.Model, SerializerMixin):
     bridge_type = db.Column(db.String, nullable=False)
 
     # Relationships
-    models = db.relationship('Model', back_populates='bridges')
+    models = db.relationship('Model', back_populates='bridge')
 
 
 # TuningMachine Model
@@ -213,7 +213,7 @@ class TuningMachine(db.Model, SerializerMixin):
     machine_type = db.Column(db.String, nullable=False)
 
     # Relationships
-    models = db.relationship('Model', back_populates='tuning_machines')
+    models = db.relationship('Model', back_populates='tuning_machine')
 
 
 # StringTree Model
@@ -224,7 +224,7 @@ class StringTree(db.Model, SerializerMixin):
     tree_type = db.Column(db.String, nullable=False)
 
     # Relationships
-    models = db.relationship('Model', back_populates='string_trees')
+    models = db.relationship('Model', back_populates='string_tree')
 
 
 # Pickguard Model
@@ -236,7 +236,7 @@ class Pickguard(db.Model, SerializerMixin):
     color = db.Column(db.String, nullable=False)
 
     # Relationships
-    models = db.relationship('Model', back_populates='pickguards')
+    models = db.relationship('Model', back_populates='pickguard')
 
 
 # ControlKnob Model
@@ -247,7 +247,7 @@ class ControlKnob(db.Model, SerializerMixin):
     style = db.Column(db.String, nullable=False)
 
     # Relationships
-    models = db.relationship('Model', back_populates='control_knobs')
+    models = db.relationship('Model', back_populates='control_knob')
 
 
 # SwitchTip Model
@@ -258,7 +258,7 @@ class SwitchTip(db.Model, SerializerMixin):
     style = db.Column(db.String, nullable=False)
 
     # Relationships
-    models = db.relationship('Model', back_populates='switch_tips')
+    models = db.relationship('Model', back_populates='switch_tip')
 
 
 # NeckPlate Model
@@ -269,4 +269,4 @@ class NeckPlate(db.Model, SerializerMixin):
     style = db.Column(db.String, nullable=False)
 
     # Relationships
-    models = db.relationship('Model', back_populates='neck_plates')
+    models = db.relationship('Model', back_populates='neck_plate')
