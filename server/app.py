@@ -126,7 +126,6 @@ class Guitars(Resource):
 
             return new_guitar.to_dict(), 201
         
-        #look into rollback function
         except Exception as e:
             db.session.rollback()
             return {'error': str(e)}, 400
@@ -187,6 +186,7 @@ class Models(Resource):
     def post(self):
         data = request.get_json()
 
+        #not final, but should work for creating new Models for now
         try:
             new_model = Model(
                 name=data.get('name'),
@@ -206,21 +206,58 @@ class Models(Resource):
                 neck_plate_id=data.get('neck_plate_id'),
             )
 
-            #need to figure out how to add attributes smoothly.
-            #by ID? need to search each model for cooresponding ID?
-            #should I modify the Model? is ID tied to dropdowns/searching?
-
             db.session.add(new_model)
             db.session.commit()
 
             return new_model.to_dict(), 201
         
-        #look into rollback function
+        #look into rollback function, though it makes sense
         except Exception as e:
             db.session.rollback()
             return {'error': str(e)}, 400
 
-#models (by ID)
+class ModelByID(Resource):
+    def get(self, model_id):
+        if not (model := Model.query.filter_by(id=model_id).one_or_none()):
+            return {'error': 'Model not found'}, 404
+        return model.to_dict(), 200
+    
+    def put(self, model_id):
+        if not (model := Model.query.filter_by(id=model_id).one_or_none()):
+            return {'error': 'Model not found'}, 404
+        
+        data = request.get_json()
+        try:
+            model.name = data.get('name', model.name),
+            model.years = data.get('years', model.years),
+            model.body_id = data.get('body_id', model.body_id),
+            model.neck_id = data.get('neck_id', model.neck_id),
+            model.fretboard_id = data.get('fretboard_id', model.fretboard_id),
+            model.nut_id = data.get('nut_id', model.nut_id),
+            model.truss_rod_id = data.get('truss_rod_id', model.truss_rod_id),
+            model.pickups_id = data.get('pickups_id', model.pickups_id),
+            model.bridge_id = data.get('bridge_id', model.bridge_id),
+            model.tuning_machine_id = data.get('tuning_machine_id', model.tuning_machine_id),
+            model.string_tree_id = data.get('string_tree_id', model.string_tree_id),
+            model.pickguard_id = data.get('pickguard_id', model.pickguard_id),
+            model.control_knob_id = data.get('control_knob_id', model.control_knob_id),
+            model.switch_tip_id = data.get('switch_tip_id', model.switch_tip_id),
+            model.neck_plate_id = data.get('neck_plate_id', model.neck_plate_id),
+
+            db.session.commit()
+            return model.to_dict(), 200
+
+        except Exception as e:
+            print(str(e)) 
+            return {'error': str(e)}, 400
+
+    def delete(self, model_id):
+        if not (model := Model.query.filter_by(id=model_id).one_or_none()):
+            return {'error': 'Model not found'}, 404
+
+        db.session.delete(model)
+        db.session.commit()
+        return '', 204
 
 #models (by given data: could be many)
 
