@@ -191,10 +191,24 @@ class Models(Resource):
             new_model = Model(
                 name=data.get('name'),
                 years=data.get('years'),
-                #need to figure out how to add attributes smoothly.
-                #by ID? need to search each model for cooresponding ID?
-                #should I modify the Model? is ID tied to dropdowns/searching?
+                body_id=data.get('body_id'),
+                neck_id=data.get('neck_id'),
+                fretboard_id=data.get('fretboard_id'),
+                nut_id=data.get('nut_id'),
+                truss_rod_id=data.get('truss_rod_id'),
+                pickups_id=data.get('pickups_id'),
+                bridge_id=data.get('bridge_id'),
+                tuning_machine_id=data.get('tuning_machine_id'),
+                string_tree_id=data.get('string_tree_id'),
+                pickguard_id=data.get('pickguard_id'),
+                control_knob_id=data.get('control_knob_id'),
+                switch_tip_id=data.get('switch_tip_id'),
+                neck_plate_id=data.get('neck_plate_id'),
             )
+
+            #need to figure out how to add attributes smoothly.
+            #by ID? need to search each model for cooresponding ID?
+            #should I modify the Model? is ID tied to dropdowns/searching?
 
             db.session.add(new_model)
             db.session.commit()
