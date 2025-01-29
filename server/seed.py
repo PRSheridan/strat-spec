@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-
-# Standard library imports
+#seed.py
 from random import sample, choice
 from faker import Faker
 
-# Local imports
 from app import app
 from models import db, User, Guitar, Model, Body, Neck, Fretboard, Nut, TrussRod, Pickups, Bridge, TuningMachine, StringTree, Pickguard, ControlKnob, SwitchTip, NeckPlate
 
@@ -43,9 +41,9 @@ if __name__ == '__main__':
 
         # Fretboard Model Data
         fretboards = [
-            Fretboard(material="Maple", radius="9.5\"", frets="22"),
-            Fretboard(material="Rosewood", radius="12\"", frets="24"),
-            Fretboard(material="Ebony", radius="10\"", frets="21")
+            Fretboard(material="Maple", radius="9.5", frets="22"),
+            Fretboard(material="Rosewood", radius="12", frets="24"),
+            Fretboard(material="Ebony", radius="10", frets="21")
         ]
         db.session.add_all(fretboards)
 

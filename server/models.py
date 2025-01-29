@@ -1,3 +1,4 @@
+#models.py
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -5,7 +6,7 @@ from config import db, bcrypt
 
 
 # User Model
-class User(db.Model, SerializerMixin):
+class User(db.Model):
     __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -40,7 +41,7 @@ class User(db.Model, SerializerMixin):
 
 
 # Guitar Model
-class Guitar(db.Model, SerializerMixin):
+class Guitar(db.Model):
     __tablename__ = 'guitar'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -58,13 +59,8 @@ class Guitar(db.Model, SerializerMixin):
 
 
 # Model Model
-class Model(db.Model, SerializerMixin):
+class Model(db.Model):
     __tablename__ = 'model'
-
-    serialize_rules = ('-body.model', '-neck.model', '-fretboard.model', '-nut.model',
-                       '-truss_rod.model', '-pickups.model', '-bridge.model', '-tuning_machine.model',
-                       '-string_tree.model', '-pickguard.model', '-control_knob.model', '-switch_tip.model',
-                       '-neck_plate.model')
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
@@ -104,10 +100,8 @@ class Model(db.Model, SerializerMixin):
 #Guitar Attributes (no specific methods to search yet)
 
 # Image Model
-class Image(db.Model, SerializerMixin):
+class Image(db.Model):
     __tablename__ = 'image'
-
-    serialize_rules = ('-ticket',)  # Omit ticket to prevent recursion
 
     id = db.Column(db.Integer, primary_key=True)
     file_path = db.Column(db.String, nullable=False)
@@ -117,10 +111,8 @@ class Image(db.Model, SerializerMixin):
     guitar = db.relationship('Guitar', back_populates='images')
 
 # Body Model
-class Body(db.Model, SerializerMixin):
+class Body(db.Model):
     __tablename__ = 'body'
-
-    serialize_rules = ('-models',)
 
     id = db.Column(db.Integer, primary_key=True)
     body_type = db.Column(db.String, nullable=False)
@@ -133,10 +125,8 @@ class Body(db.Model, SerializerMixin):
 
 
 # Neck Model
-class Neck(db.Model, SerializerMixin):
+class Neck(db.Model):
     __tablename__ = 'neck'
-
-    serialize_rules = ('-models',)
 
     id = db.Column(db.Integer, primary_key=True)
     shape = db.Column(db.String, nullable=False)
@@ -148,7 +138,7 @@ class Neck(db.Model, SerializerMixin):
 
 
 # Fretboard Model
-class Fretboard(db.Model, SerializerMixin):
+class Fretboard(db.Model):
     __tablename__ = 'fretboard'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -161,7 +151,7 @@ class Fretboard(db.Model, SerializerMixin):
 
 
 # Nut Model
-class Nut(db.Model, SerializerMixin):
+class Nut(db.Model):
     __tablename__ = 'nut'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -172,7 +162,7 @@ class Nut(db.Model, SerializerMixin):
 
 
 # TrussRod Model
-class TrussRod(db.Model, SerializerMixin):
+class TrussRod(db.Model):
     __tablename__ = 'truss_rod'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -184,7 +174,7 @@ class TrussRod(db.Model, SerializerMixin):
 
 
 # Pickups Model
-class Pickups(db.Model, SerializerMixin):
+class Pickups(db.Model):
     __tablename__ = 'pickups'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -195,7 +185,7 @@ class Pickups(db.Model, SerializerMixin):
 
 
 # Bridge Model
-class Bridge(db.Model, SerializerMixin):
+class Bridge(db.Model):
     __tablename__ = 'bridge'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -206,7 +196,7 @@ class Bridge(db.Model, SerializerMixin):
 
 
 # TuningMachine Model
-class TuningMachine(db.Model, SerializerMixin):
+class TuningMachine(db.Model):
     __tablename__ = 'tuning_machine'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -217,7 +207,7 @@ class TuningMachine(db.Model, SerializerMixin):
 
 
 # StringTree Model
-class StringTree(db.Model, SerializerMixin):
+class StringTree(db.Model):
     __tablename__ = 'string_tree'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -228,7 +218,7 @@ class StringTree(db.Model, SerializerMixin):
 
 
 # Pickguard Model
-class Pickguard(db.Model, SerializerMixin):
+class Pickguard(db.Model):
     __tablename__ = 'pickguard'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -240,7 +230,7 @@ class Pickguard(db.Model, SerializerMixin):
 
 
 # ControlKnob Model
-class ControlKnob(db.Model, SerializerMixin):
+class ControlKnob(db.Model):
     __tablename__ = 'control_knob'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -251,7 +241,7 @@ class ControlKnob(db.Model, SerializerMixin):
 
 
 # SwitchTip Model
-class SwitchTip(db.Model, SerializerMixin):
+class SwitchTip(db.Model):
     __tablename__ = 'switch_tip'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -262,7 +252,7 @@ class SwitchTip(db.Model, SerializerMixin):
 
 
 # NeckPlate Model
-class NeckPlate(db.Model, SerializerMixin):
+class NeckPlate(db.Model):
     __tablename__ = 'neck_plate'
 
     id = db.Column(db.Integer, primary_key=True)
