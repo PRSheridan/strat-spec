@@ -2,7 +2,7 @@ import { Outlet, useLocation } from "react-router-dom"
 import "./App.css"
 
 import NavBar from './components/NavBar'
-import SearchForm from './components/SearchForm'
+import SearchForm from './components/forms/SearchForm'
 
 function App() {
 const location = useLocation()

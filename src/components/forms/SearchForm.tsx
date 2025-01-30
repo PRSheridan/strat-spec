@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function SearchForm () {
@@ -18,9 +18,9 @@ function SearchForm () {
               type="text"
               value={SN}
               onChange={(e) => setSN(e.target.value)} />
-            <input type="submit" />
+            <input type="submit" value="Search"/>
         </form>
-        <p>Enter your Stratocaster's serial number above and hit enter</p>
+        <p>Enter your Stratocaster's serial number above.</p>
       </div>
     )
 }
