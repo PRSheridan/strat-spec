@@ -3,6 +3,7 @@ import "./App.css"
 
 import NavBar from './components/NavBar'
 import SearchForm from './components/forms/SearchForm'
+import { GuitarProvider } from "./context/GuitarContext"
 
 function App() {
 const location = useLocation()
@@ -14,7 +15,9 @@ const showSearchForm = location.pathname === "/"
       {showSearchForm && <SearchForm />}
 
       <main>
-        <Outlet />
+        <GuitarProvider >
+          <Outlet />
+        </GuitarProvider>
       </main>
     </>
   )

@@ -1,28 +1,27 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"
+import CatalogueItem from "../components/CatalogueItem"
+import { Guitar } from "../types/Guitar"
 
-import CatalogueItem from '../components/CatalogueItem'
-
-//explore is used for searching existing guitars by spec
-
-function Explore () {
-    const [catalogue, setCatalogue] = useState<any[]>([])
+function Explore() {
+    const [catalogue, setCatalogue] = useState<Guitar[]>([])
 
     useEffect(() => {
-        fetch('/guitars')
-          .then((response) => response.json())
-          .then((data) => {
-            setCatalogue(data)
-          })
-      }, [])
+        fetch("/guitars")
+            .then((response) => response.json())
+            .then((data: Guitar[]) => {
+                setCatalogue(data)
+            })
+            .catch((error) => console.error("Error fetching guitars:", error))
+    }, [])
 
     return (
         <>
             <div>User Submissions</div>
             {catalogue.map((item) => (
-                <CatalogueItem item={item}/>
+                <CatalogueItem key={item.id} item={item} />
             ))}
         </>
-    )
+    );
 }
 
 export default Explore
