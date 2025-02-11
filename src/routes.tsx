@@ -1,7 +1,8 @@
 import App from "./App"
 import Specs from "./pages/Specs"
 import Login from "./pages/Login"
-import Explore from "./pages/Explore"
+import Catalogue from "./pages/Catalogue"
+import Models from "./pages/Models"
 import Profile from "./pages/Profile"
 import Info from "./pages/Info"
 
@@ -19,8 +20,12 @@ const routes = [
         element: <Login />
       },
       {
-        path: "/explore",
-        element: <Explore />
+        path: "/catalogue",
+        element: <Catalogue />
+      },
+      {
+        path: "/models",
+        element: <Models />
       },
       {
         path: "/info",

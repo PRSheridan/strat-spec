@@ -16,7 +16,7 @@ function CatalogueItem({ item }: CatalogueProps) {
     }
 
     return (
-        <div key={item.id} className="item-card" onClick={() => handleSelectGuitar(item)}>
+        <div key={item.id} className="guitar-card" onClick={() => handleSelectGuitar(item)}>
             <div className="item-details">{item.name}</div>
             <div className="item-details">{item.serial_number}</div>
         </div>

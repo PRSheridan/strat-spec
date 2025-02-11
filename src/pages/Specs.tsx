@@ -23,7 +23,7 @@ function Specs() {
     return (
         <>
             {displayGuitar ? (
-                <div>
+                <div id="guitar-specs">
                     <h1>{displayGuitar.name}</h1>
                     <p>Model: {displayGuitar.model.name} ({displayGuitar.model.years})</p>
                 </div>

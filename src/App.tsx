@@ -2,18 +2,17 @@ import { Outlet, useLocation } from "react-router-dom"
 import "./App.css"
 
 import NavBar from './components/NavBar'
-import SearchForm from './components/forms/SearchForm'
+import Feed from './pages/Feed'
 import { GuitarProvider } from "./context/GuitarContext"
 
 function App() {
-const location = useLocation()
-const showSearchForm = location.pathname === "/"
+  const location = useLocation()
+  const showGuitarFeed = location.pathname === "/"
 
   return (
     <>
       <NavBar />
-      {showSearchForm && <SearchForm />}
-
+      {showGuitarFeed && <Feed />}
       <main>
         <GuitarProvider >
           <Outlet />
