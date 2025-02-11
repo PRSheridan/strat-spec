@@ -6,7 +6,7 @@ function Explore() {
     const [catalogue, setCatalogue] = useState<Guitar[]>([])
 
     useEffect(() => {
-        fetch("/guitars")
+        fetch("/api/guitars")
             .then((response) => response.json())
             .then((data: Guitar[]) => {
                 setCatalogue(data)

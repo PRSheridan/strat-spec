@@ -179,16 +179,16 @@ class ModelByID(Resource):
         db.session.commit()
         return {}, 204
 
-api.add_resource(CheckSession, '/check_session')
-api.add_resource(Signup, '/signup')
-api.add_resource(Login, '/login')
-api.add_resource(Logout, '/logout')
-api.add_resource(Users, '/users')
-api.add_resource(UserByID, '/user/<int:user_id>')
-api.add_resource(Guitars, '/guitars')
-api.add_resource(GuitarBySN, '/guitar/<string:serial_number>')
-api.add_resource(Models, '/models')
-api.add_resource(ModelByID, '/model/<int:model_id>')
+api.add_resource(CheckSession, '/api/check_session')
+api.add_resource(Signup, '/api/signup')
+api.add_resource(Login, '/api/login')
+api.add_resource(Logout, '/api/logout')
+api.add_resource(Users, '/api/users')
+api.add_resource(UserByID, '/api/user/<int:user_id>')
+api.add_resource(Guitars, '/api/guitars')
+api.add_resource(GuitarBySN, '/api/guitar/<string:serial_number>')
+api.add_resource(Models, '/api/models')
+api.add_resource(ModelByID, '/api/model/<int:model_id>')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

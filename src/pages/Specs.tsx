@@ -11,7 +11,7 @@ function Specs() {
     useEffect(() => {
         if (!guitar && serialNumber) {
             console.log(serialNumber)
-            fetch(`/guitar/${serialNumber}`)
+            fetch(`/api/guitar/${serialNumber}`)
                 .then((response) => response.json())
                 .then((data: Guitar) => setFetchedGuitar(data))
                 .catch((error) => console.error("Error fetching guitar:", error))
