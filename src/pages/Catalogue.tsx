@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react"
-import CatalogueItem from "../components/CatalogueItem"
-import { Guitar } from "../types/Guitar"
+import CatalogueItem from "../components/GuitarCard"
+import { UserGuitar } from "../types"
 
 function Explore() {
-    const [catalogue, setCatalogue] = useState<Guitar[]>([])
+    const [catalogue, setCatalogue] = useState<UserGuitar[]>([])
 
     useEffect(() => {
         fetch("/api/guitars")
             .then((response) => response.json())
-            .then((data: Guitar[]) => {
+            .then((data: UserGuitar[]) => {
                 setCatalogue(data)
             })
             .catch((error) => console.error("Error fetching guitars:", error))

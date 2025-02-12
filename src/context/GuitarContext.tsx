@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-import { Guitar } from "../types/Guitar";
+import { Guitar } from "../types";
 
 interface GuitarContextType {
     guitar: Guitar | null;
