@@ -1,8 +1,8 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from marshmallow import fields
 from models import (
-    User, Guitar, Model, Image, Body, Neck, Fretboard, Nut, TrussRod, Pickups, 
-    Bridge, TuningMachine, StringTree, Pickguard, ControlKnob, SwitchTip, NeckPlate
+    User, UserGuitar, Model, Image, Body, Neck, Headstock, Fretboard, Nut, Frets, Inlays,
+    Bridge, Saddles, Switch, Controls, TuningMachine, StringTree, NeckPlate, Pickguard
 )
 
 class UserSchema(SQLAlchemyAutoSchema):
@@ -10,266 +10,316 @@ class UserSchema(SQLAlchemyAutoSchema):
         model = User
         load_instance = True
         ordered = True
-        json_module = True  
 
     id = fields.Integer()
     username = fields.String()
     email = fields.String()
-    role = fields.String()
-    guitars = fields.List(fields.Nested(lambda: GuitarSchema(exclude=['user'])))
+    user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=['owner'])))
 
-    def to_json(self, obj, many=False):
-        return self.dump(obj, many=many)
-
-class GuitarSchema(SQLAlchemyAutoSchema):
+class UserGuitarSchema(SQLAlchemyAutoSchema):
     class Meta:
-        model = Guitar
+        model = UserGuitar
         load_instance = True
         ordered = True
-        json_module = True  
 
     id = fields.Integer()
-    name = fields.String()
-    description = fields.String()
-    serial_number = fields.String()
-    user = fields.Nested(lambda: UserSchema(exclude=["guitars"]))
-    model = fields.Nested(lambda: ModelSchema(exclude=["guitars"]))
-    images = fields.List(fields.Nested(lambda: ImageSchema()))
+    serial_number = fields.Integer()
+    serial_number_location = fields.String()
+    year = fields.String()
+    country = fields.String()
+    weight = fields.Integer()
+    pickup_configuration = fields.String()
+    other_controls = fields.String()
+    hardware_finish = fields.String()
+    modified = fields.Boolean()
+    modifications = fields.String()
+    relic = fields.String()
 
-    def to_json(self, obj, many=False):
-        return self.dump(obj, many=many)
+    owner = fields.Nested(lambda: UserSchema(exclude=["user_guitars"]))
+    model = fields.Nested(lambda: ModelSchema(exclude=["user_guitars"]))
+
+    body = fields.Nested(lambda: BodySchema(exclude=["models", "user_guitars"]))
+    neck = fields.Nested(lambda: NeckSchema(exclude=["models", "user_guitars"]))
+    headstock = fields.Nested(lambda: HeadstockSchema(exclude=["models", "user_guitars"]))
+    fretboard = fields.Nested(lambda: FretboardSchema(exclude=["models", "user_guitars"]))
+    nut = fields.Nested(lambda: NutSchema(exclude=["models", "user_guitars"]))
+    frets = fields.Nested(lambda: FretsSchema(exclude=["models", "user_guitars"]))
+    inlays = fields.Nested(lambda: InlaysSchema(exclude=["models", "user_guitars"]))
+    bridge = fields.Nested(lambda: BridgeSchema(exclude=["models", "user_guitars"]))
+    saddles = fields.Nested(lambda: SaddlesSchema(exclude=["models", "user_guitars"]))
+    switch = fields.Nested(lambda: SwitchSchema(exclude=["models", "user_guitars"]))
+    controls = fields.Nested(lambda: ControlsSchema(exclude=["models", "user_guitars"]))
+    tuning_machine = fields.Nested(lambda: TuningMachineSchema(exclude=["models", "user_guitars"]))
+    string_tree = fields.Nested(lambda: StringTreeSchema(exclude=["models", "user_guitars"]))
+    neck_plate = fields.Nested(lambda: NeckPlateSchema(exclude=["models", "user_guitars"]))
+    pickguard = fields.Nested(lambda: PickguardSchema(exclude=["models", "user_guitars"]))
 
 class ModelSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Model
         load_instance = True
         ordered = True
-        json_module = True  
 
     id = fields.Integer()
-    name = fields.String()
-    years = fields.String()
-    body = fields.Nested(lambda: BodySchema(exclude=["models"]))
-    neck = fields.Nested(lambda: NeckSchema(exclude=["models"]))
-    fretboard = fields.Nested(lambda: FretboardSchema(exclude=["models"]))
-    nut = fields.Nested(lambda: NutSchema(exclude=["models"]))
-    truss_rod = fields.Nested(lambda: TrussRodSchema(exclude=["models"]))
-    pickups = fields.Nested(lambda: PickupsSchema(exclude=["models"]))
-    bridge = fields.Nested(lambda: BridgeSchema(exclude=["models"]))
-    tuning_machine = fields.Nested(lambda: TuningMachineSchema(exclude=["models"]))
-    string_tree = fields.Nested(lambda: StringTreeSchema(exclude=["models"]))
-    pickguard = fields.Nested(lambda: PickguardSchema(exclude=["models"]))
-    control_knob = fields.Nested(lambda: ControlKnobSchema(exclude=["models"]))
-    switch_tip = fields.Nested(lambda: SwitchTipSchema(exclude=["models"]))
-    neck_plate = fields.Nested(lambda: NeckPlateSchema(exclude=["models"]))
-    guitars = fields.List(fields.Nested(lambda: GuitarSchema(exclude=["model"])))
+    model_name = fields.String()
+    year_range = fields.String()
+    country = fields.String()
+    pickup_configuration = fields.String()
+    other_controls = fields.String()
+    hardware_finish = fields.String()
+    relic = fields.String()
 
-    def to_json(self, obj, many=False):
-        return self.dump(obj, many=many)
+    body = fields.Nested(lambda: BodySchema(exclude=["models", "user_guitars"]))
+    neck = fields.Nested(lambda: NeckSchema(exclude=["models", "user_guitars"]))
+    headstock = fields.Nested(lambda: HeadstockSchema(exclude=["models", "user_guitars"]))
+    fretboard = fields.Nested(lambda: FretboardSchema(exclude=["models", "user_guitars"]))
+    nut = fields.Nested(lambda: NutSchema(exclude=["models", "user_guitars"]))
+    frets = fields.Nested(lambda: FretsSchema(exclude=["models", "user_guitars"]))
+    inlays = fields.Nested(lambda: InlaysSchema(exclude=["models", "user_guitars"]))
+    bridge = fields.Nested(lambda: BridgeSchema(exclude=["models", "user_guitars"]))
+    saddles = fields.Nested(lambda: SaddlesSchema(exclude=["models", "user_guitars"]))
+    switch = fields.Nested(lambda: SwitchSchema(exclude=["models", "user_guitars"]))
+    controls = fields.Nested(lambda: ControlsSchema(exclude=["models", "user_guitars"]))
+    tuning_machine = fields.Nested(lambda: TuningMachineSchema(exclude=["models", "user_guitars"]))
+    string_tree = fields.Nested(lambda: StringTreeSchema(exclude=["models", "user_guitars"]))
+    neck_plate = fields.Nested(lambda: NeckPlateSchema(exclude=["models", "user_guitars"]))
+    pickguard = fields.Nested(lambda: PickguardSchema(exclude=["models", "user_guitars"]))
+
+    user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["model"])))
+
 
 class ImageSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Image
         load_instance = True
         ordered = True
-        json_module = True  
 
     id = fields.Integer()
     file_path = fields.String()
-    guitar = fields.Nested(lambda: GuitarSchema(exclude=["images"]))
-
-    def to_json(self, obj, many=False):
-        return self.dump(obj, many=many)
+    guitar = fields.Nested(lambda: UserGuitarSchema(exclude=["images"]))
 
 class BodySchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Body
         load_instance = True
         ordered = True
-        json_module = True  
 
     id = fields.Integer()
-    body_type = fields.String()
-    body_wood = fields.String()
+    wood = fields.String()
+    contour = fields.String()
+    routing = fields.String()
+    finish = fields.String()
     color = fields.String()
-    finish_type = fields.String()
-    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["body"])))
 
-    def to_json(self, obj, many=False):
-        return self.dump(obj, many=many)
+    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["body"])))
+    user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["body"])))
+
 
 class NeckSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Neck
         load_instance = True
         ordered = True
-        json_module = True  
+
+    id = fields.Integer()
+    wood = fields.String()
+    finish = fields.String()
+    shape = fields.String()
+    scale_length = fields.String()
+    truss_rod = fields.String()
+
+    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["neck"])))
+    user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["neck"])))
+
+
+class HeadstockSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Headstock
+        load_instance = True
+        ordered = True
 
     id = fields.Integer()
     shape = fields.String()
-    wood = fields.String()
-    finish = fields.String()
-    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["neck"])))
+    decal_style = fields.String()
+    reverse = fields.Boolean()
 
-    def to_json(self, obj, many=False):
-        return self.dump(obj, many=many)
+    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["headstock"])))
+    user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["headstock"])))
+
 
 class FretboardSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Fretboard
         load_instance = True
         ordered = True
-        json_module = True  
 
     id = fields.Integer()
     material = fields.String()
     radius = fields.String()
-    frets = fields.String()
-    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["fretboard"])))
 
-    def to_json(self, obj, many=False):
-        return self.dump(obj, many=many)
+    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["fretboard"])))
+    user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["fretboard"])))
+
 
 class NutSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Nut
         load_instance = True
         ordered = True
-        json_module = True  
 
     id = fields.Integer()
+    width = fields.String()
     material = fields.String()
+    locking = fields.Boolean()
+
     models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["nut"])))
+    user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["nut"])))
 
-    def to_json(self, obj, many=False):
-        return self.dump(obj, many=many)
 
-class TrussRodSchema(SQLAlchemyAutoSchema):
+class FretsSchema(SQLAlchemyAutoSchema):
     class Meta:
-        model = TrussRod
+        model = Frets
         load_instance = True
         ordered = True
-        json_module = True  
 
     id = fields.Integer()
-    type = fields.String()
-    location = fields.String()
-    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["truss_rod"])))
+    count = fields.Integer()
+    material = fields.String()
+    size = fields.String()
 
-    def to_json(self, obj, many=False):
-        return self.dump(obj, many=many)
+    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["frets"])))
+    user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["frets"])))
 
-class PickupsSchema(SQLAlchemyAutoSchema):
+
+class InlaysSchema(SQLAlchemyAutoSchema):
     class Meta:
-        model = Pickups
+        model = Inlays
         load_instance = True
         ordered = True
-        json_module = True  
 
     id = fields.Integer()
-    pickup_configuration = fields.String()
-    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["pickups"])))
+    shape = fields.String()
+    material = fields.String()
+    spacing = fields.String()
 
-    def to_json(self, obj, many=False):
-        return self.dump(obj, many=many)
+    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["inlays"])))
+    user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["inlays"])))
+
 
 class BridgeSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Bridge
         load_instance = True
         ordered = True
-        json_module = True  
 
     id = fields.Integer()
-    bridge_type = fields.String()
-    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["bridge"])))
+    model = fields.String()
+    screws = fields.Integer()
+    spacing = fields.String()
 
-    def to_json(self, obj, many=False):
-        return self.dump(obj, many=many)
+    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["bridge"])))
+    user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["bridge"])))
+
+
+class SaddlesSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Saddles
+        load_instance = True
+        ordered = True
+
+    id = fields.Integer()
+    style = fields.String()
+    material = fields.String()
+
+    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["saddles"])))
+    user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["saddles"])))
+
+
+class SwitchSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Switch
+        load_instance = True
+        ordered = True
+
+    id = fields.Integer()
+    positions = fields.Integer()
+    color = fields.String()
+
+    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["switch"])))
+    user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["switch"])))
+
+
+class ControlsSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Controls
+        load_instance = True
+        ordered = True
+
+    id = fields.Integer()
+    configuration = fields.String()
+    color = fields.String()
+
+    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["controls"])))
+    user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["controls"])))
+
 
 class TuningMachineSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = TuningMachine
         load_instance = True
         ordered = True
-        json_module = True  
 
     id = fields.Integer()
-    machine_type = fields.String()
-    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["tuning_machine"])))
+    model = fields.String()
+    locking = fields.Boolean()
 
-    def to_json(self, obj, many=False):
-        return self.dump(obj, many=many)
+    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["tuning_machine"])))
+    user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["tuning_machine"])))
+
 
 class StringTreeSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = StringTree
         load_instance = True
         ordered = True
-        json_module = True  
 
     id = fields.Integer()
-    tree_type = fields.String()
+    model = fields.String()
+    count = fields.Integer()
+
     models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["string_tree"])))
+    user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["string_tree"])))
 
-    def to_json(self, obj, many=False):
-        return self.dump(obj, many=many)
-
-class PickguardSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = Pickguard
-        load_instance = True
-        ordered = True
-        json_module = True  
-
-    id = fields.Integer()
-    layers = fields.String()
-    color = fields.String()
-    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["pickguard"])))
-
-    def to_json(self, obj, many=False):
-        return self.dump(obj, many=many)
-
-class ControlKnobSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = ControlKnob
-        load_instance = True
-        ordered = True
-        json_module = True  
-
-    id = fields.Integer()
-    style = fields.String()
-    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["control_knob"])))
-
-    def to_json(self, obj, many=False):
-        return self.dump(obj, many=many)
-
-class SwitchTipSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = SwitchTip
-        load_instance = True
-        ordered = True
-        json_module = True  
-
-    id = fields.Integer()
-    style = fields.String()
-    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["switch_tip"])))
-
-    def to_json(self, obj, many=False):
-        return self.dump(obj, many=many)
 
 class NeckPlateSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = NeckPlate
         load_instance = True
         ordered = True
-        json_module = True  
 
     id = fields.Integer()
     style = fields.String()
-    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["neck_plate"])))
+    bolts = fields.Integer()
 
-    def to_json(self, obj, many=False):
-        return self.dump(obj, many=many)
+    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["neck_plate"])))
+    user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["neck_plate"])))
+
+
+class PickguardSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Pickguard
+        load_instance = True
+        ordered = True
+
+    id = fields.Integer()
+    ply_count = fields.Integer()
+    screws = fields.Integer()
+    configuration = fields.String()
+    color = fields.String()
+
+    models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["pickguard"])))
+    user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["pickguard"])))
+
+
 
 

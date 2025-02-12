@@ -19,13 +19,13 @@ function Specs() {
     }, [guitar, serialNumber])
 
     const displayGuitar = guitar || fetchedGuitar
-
+    console.log(displayGuitar)
     return (
         <>
             {displayGuitar ? (
                 <div id="guitar-specs">
-                    <h1>{displayGuitar.name}</h1>
-                    <p>Model: {displayGuitar.model.name} ({displayGuitar.model.years})</p>
+                    <h1>{displayGuitar.serial_number}</h1>
+                    <p>Model: {displayGuitar.model.model_name}</p>
                 </div>
             ) : (
                 <p>Loading...</p>

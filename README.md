@@ -17,7 +17,7 @@ python app.py
 
 ### **Pages & Navigation**
 
-- **Explore Page:** Lists user-guitars with filtering and sorting options.
+- **Catalogue Page:** Lists user-guitars with filtering and sorting options.
 - **Guitar Specs Page:** Displays a user-guitar; if it matches a model, links to the model’s specs page.
 - **Model Specs Page:** Displays official models with fixed specifications.
 - **Profile Pages:** Each user has a profile listing their guitars and a bio.
@@ -53,3 +53,39 @@ python app.py
 - **Automatic Flagging:** The system detects user-guitars that match common specifications and flags them for potential model status.
 - **Admin Review:** Admins can review flagged guitars and manually approve them as models.
 - **"Suggest as Model":** Users can recommend a guitar for model consideration, alerting admins.
+
+model_name (string)
+serial_number (number)
+serial_number_location (string)
+year (string)
+country (string)
+weight (int)
+pickup_configuration (configuration)
+other_controls
+hardware_finish
+modified (bool)
+modifications (string)
+relic (string)
+
+body (wood, contour, routing, finish, color)
+neck (wood, finish, shape, scale_length, truss_rod)
+headstock (shape, decal_style, reverse?)
+fretboard (material, radius)
+nut (width, material, locking?)
+frets (int, material, size)
+inlays (shape, material, spacing)
+
+bridge (model, screws, spacing)
+saddles (style, material)
+switch (positions, color)
+controls (configuration, color)
+other_controls (string)
+tuning_machine (model, locking?)
+string_tree (model, int)
+neck_plate (style, bolts)
+hardware_finish (string)
+pickguard (ply_count, screws, configuration, color)
+
+other 
+pickup_model (name, type, magnet, output, poles, cover)
+
