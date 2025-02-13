@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react"
-import CatalogueItem from "../components/GuitarCard"
+import GuitarCard from "../components/GuitarCard"
 import { UserGuitar } from "../types"
 
-function Explore() {
+function Guitars() {
     const [catalogue, setCatalogue] = useState<UserGuitar[]>([])
 
+    // Fetches all UserGuitars and updates the catalogue
     useEffect(() => {
         fetch("/api/guitars")
             .then((response) => response.json())
@@ -13,15 +14,16 @@ function Explore() {
             })
             .catch((error) => console.error("Error fetching guitars:", error))
     }, [])
-
+    
+    // Map the UserGuitar data to individual GuitarCards
     return (
         <>
-            <div>User Submissions</div>
+            <div>User Submitted Stratocasters</div>
             {catalogue.map((item) => (
-                <CatalogueItem key={item.id} item={item} />
+                <GuitarCard key={item.id} item={item} />
             ))}
         </>
     );
 }
 
-export default Explore
+export default Guitars

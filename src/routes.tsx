@@ -1,7 +1,7 @@
 import App from "./App"
 import Specs from "./pages/Specs"
 import Login from "./pages/Login"
-import Catalogue from "./pages/Catalogue"
+import Guitars from "./pages/Guitars"
 import Models from "./pages/Models"
 import Profile from "./pages/Profile"
 import Info from "./pages/Info"
@@ -12,20 +12,24 @@ const routes = [
     element: <App />,
     children: [
       {
-        path: "/specs/:serialNumber",
-        element: <Specs />
-      },
-      {
         path: "/login",
         element: <Login />
       },
       {
-        path: "/catalogue",
-        element: <Catalogue />
+        path: "/guitars",
+        element: <Guitars />
+      },
+      {
+        path: "/guitar/:serialNumber",
+        element: <Specs />
       },
       {
         path: "/models",
         element: <Models />
+      },
+      {
+        path: "/model/:modelName",
+        element: <Specs />
       },
       {
         path: "/info",

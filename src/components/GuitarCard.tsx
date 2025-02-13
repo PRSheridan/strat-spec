@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom"
 import { useGuitar } from "../context/GuitarContext"
 import { UserGuitar, Model } from "../types"
 
+// an item can be either a UserGuitar or a Guitar Model
 interface GuitarCardProps {
     item: UserGuitar | Model
 }
@@ -15,18 +16,28 @@ function GuitarCard({ item }: GuitarCardProps) {
             setGuitar(item)
             navigate(`/specs/${item.serial_number}`)
         } else {
-            navigate(`/models/${item.id}`)
+            navigate(`/models/${item.model_name}`)
         }
     }
 
     const isUserGuitar = "serial_number" in item
-    const modelName = "model_name" in item ? item.model_name : item.model?.model_name || "Unknown Model"
-    const serialNumber = isUserGuitar ? item.serial_number : "Model"
 
     return (
         <div key={item.id} className="guitar-card" onClick={() => handleSelectItem(item)}>
-            <div className="item-details">{modelName}</div>
-            {isUserGuitar && <div className="item-details">{serialNumber}</div>}
+            {isUserGuitar ? 
+                <div className="item-details">
+                    <div>Serial Number: {item.serial_number}</div>
+                    <div>Year: {item.year}</div>
+                    <div>Country: {item.country}</div>
+                    <div>Owner: {item.owner.username}</div>
+                </div>
+            : 
+                <div className="item-details">
+                    <div>Model: {item.model_name}</div>
+                    <div>Years: {item.year_range}</div>
+                    <div>Country: {item.country}</div>
+                </div>
+            }
         </div>
     )
 }

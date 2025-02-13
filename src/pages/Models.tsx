@@ -16,7 +16,7 @@ function Models() {
 
     return (
         <>
-            <div>User Submissions</div>
+            <div>Stratocaster Models</div>
             {models.map((item) => (
                 <GuitarCard key={item.id} item={item} />
             ))}
