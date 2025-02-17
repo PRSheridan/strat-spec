@@ -1,6 +1,4 @@
 import { Outlet, useLocation } from "react-router-dom"
-import "./App.css"
-
 import NavBar from './components/NavBar'
 import Feed from './pages/Feed'
 import { GuitarProvider } from "./context/GuitarContext"

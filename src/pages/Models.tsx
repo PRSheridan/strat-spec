@@ -4,6 +4,7 @@ import { Model } from "../types"
 
 function Models() {
     const [models, setModels] = useState<Model[]>([])
+    const [viewMode, setViewMode] = useState<'compact' | 'detailed'>('detailed')
 
     useEffect(() => {
         fetch("/api/models")
@@ -16,10 +17,18 @@ function Models() {
 
     return (
         <>
-            <div>Stratocaster Models</div>
-            {models.map((item) => (
-                <GuitarCard key={item.id} item={item} />
-            ))}
+            <div className="header-container">
+                <div className="page-name">Stratocaster Models</div>
+                <button className="toggle-view-btn" onClick={() => setViewMode(viewMode === 'compact' ? 'detailed' : 'compact')}>
+                    {viewMode === 'compact' ? 'Switch to Detailed View' : 'Switch to Compact View'}
+                </button>
+            </div>
+
+            <div className="list-container">
+                {models.map((item) => (
+                    <GuitarCard key={item.id} item={item} viewMode={viewMode} />
+                ))}
+            </div>
         </>
     );
 }
