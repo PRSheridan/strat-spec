@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # seed.py
-from random import choice, randint
+from random import choice, randint, shuffle
 from faker import Faker
 
 from app import app
@@ -123,10 +123,12 @@ if __name__ == '__main__':
         db.session.add_all(models)
         db.session.commit()
 
-                # Create UserGuitars
+        # Create UserGuitars
         user_guitars = []
         for i in range(200):
-            model = choice(models) if randint(0, 1) else None
+            model = choice(models) if randint(1, 10) <= 6 else None  # 30% chance of having a model
+            is_modified = choice([True, False]) if model else True  # If it has a model, 50% chance of being modified
+
             user_guitar = UserGuitar(
                 name=f"Stratocaster #{i+1}",
                 serial_number=randint(100000, 999999),
@@ -137,8 +139,8 @@ if __name__ == '__main__':
                 pickup_configuration=choice(["SSS", "HSS", "HH"]),
                 other_controls=choice(["None", "Push-Pull Tone for Coil Split"]),
                 hardware_finish=choice(["Chrome", "Nickel", "Gold"]),
-                modified=choice([True, False]),
-                modifications=fake.sentence() if randint(0, 1) else "",
+                modified=is_modified,
+                modifications=fake.sentence() if is_modified else "",
                 relic=choice(["NOS", "Light", "Heavy", "None"]),
                 owner=choice(users),
                 body=choice(bodies),
@@ -160,6 +162,7 @@ if __name__ == '__main__':
             )
             user_guitars.append(user_guitar)
 
+        shuffle(user_guitars)
         db.session.add_all(user_guitars)
         db.session.commit()
 

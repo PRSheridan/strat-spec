@@ -3,6 +3,8 @@
 from flask import request, session
 from flask_restful import Resource
 from marshmallow import ValidationError
+#temporary randomization of UserGuitars
+from sqlalchemy.sql.expression import func
 
 from config import app, db, api
 from models import User, Image, UserGuitar, Model
@@ -76,7 +78,7 @@ class UserByID(Resource):
 
 class Guitars(Resource):
     def get(self):
-        return guitar_schema.dump(UserGuitar.query.all(), many=True), 200
+        return guitar_schema.dump(UserGuitar.query.order_by(func.random()).all(), many=True), 200
     
     def post(self):
         data = request.get_json()
