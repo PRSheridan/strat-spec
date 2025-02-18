@@ -23,33 +23,30 @@ function GuitarCard({ item, viewMode }: GuitarCardProps) {
     const isUserGuitar = 'serial_number' in item
 
     return (
-        <div key={item.id} className={`guitar-card ${viewMode}`} onClick={() => handleSelectItem(item)}>            
-            <div className="item-name">
-                {isUserGuitar ? `SN: ${item.serial_number}` : item.model_name}
-            </div>
-
+        <div key={item.id} className={`guitar-card ${viewMode}`} onClick={() => handleSelectItem(item)}>    
 
             <img className="guitar-image" 
-                 src={''} 
-                 alt={isUserGuitar ? `SN: ${item.serial_number}` : item.model_name} />
+                 src='./src/assets/my85buqmt4reuv01rcsp.jpg'
+                 alt={isUserGuitar ? item.name : item.model_name} />    
+
+            <div className="item-name">
+                {isUserGuitar ? item.name : item.model_name}
+            </div>
 
             <div className="item-details">
                 {viewMode === 'detailed' ? (
                     isUserGuitar ? (
                         <>
+                            <div>Serial Number: {item.serial_number}</div>
                             <div>Year: {item.year}</div>
                             <div>Country: {item.country}</div>
                             <div>Owner: {item.owner.username}</div>
-                            <div>Wood: {item.body.wood}</div>
-                            <div>Finish: {item.body.finish}</div>
-                            <div>Pickups: {item.pickup_configuration}</div>
                         </>
                     ) : (
                         <>
                             <div>Years: {item.year_range}</div>
                             <div>Country: {item.country}</div>
                             <div>Body Wood: {item.body.wood}</div>
-                            <div>Neck Wood: {item.neck.wood}</div>
                             <div>Fretboard: {item.fretboard.material}</div>
                             <div>Bridge: {item.bridge.model}</div>
                             <div>Pickups: {item.pickup_configuration}</div>

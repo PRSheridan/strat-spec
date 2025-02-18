@@ -23,6 +23,7 @@ class UserGuitarSchema(SQLAlchemyAutoSchema):
         ordered = True
 
     id = fields.Integer()
+    name = fields.String()
     serial_number = fields.Integer()
     serial_number_location = fields.String()
     year = fields.String()

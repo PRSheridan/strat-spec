@@ -113,6 +113,7 @@ class UserGuitar(db.Model):
     __tablename__ = 'user_guitar'
 
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
     serial_number = db.Column(db.Integer, nullable=False)
     serial_number_location = db.Column(db.String, nullable=False)
     year = db.Column(db.String, nullable=False)

@@ -310,8 +310,9 @@ if __name__ == '__main__':
 
         # Create UserGuitars
         user_guitars = []
-        for _ in range(200):
+        for i in range(200):
             user_guitar = UserGuitar(
+                name=f"Stratocaster #{i+1}",
                 serial_number=randint(100000, 999999),
                 serial_number_location="Headstock",
                 year=str(randint(1954, 2025)),
