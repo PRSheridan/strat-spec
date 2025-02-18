@@ -1,8 +1,7 @@
 import App from "./App"
-import Specs from "./pages/Specs"
 import Login from "./pages/Login"
-import Guitars from "./pages/Guitars"
-import Models from "./pages/Models"
+import List from "./pages/List"
+import Specs from "./pages/Specs"
 import Profile from "./pages/Profile"
 import Info from "./pages/Info"
 
@@ -17,18 +16,18 @@ const routes = [
       },
       {
         path: "/guitars",
-        element: <Guitars />
+        element: <List type='guitars'/>
+      },
+      {
+        path: "/models",
+        element: <List type='models'/>
       },
       {
         path: "/guitar/:serialNumber",
         element: <Specs />
       },
       {
-        path: "/models",
-        element: <Models />
-      },
-      {
-        path: "/model/:modelName",
+        path: "/model/:model_name",
         element: <Specs />
       },
       {

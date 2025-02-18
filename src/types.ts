@@ -26,6 +26,7 @@ export interface Model {
 }
 
 export interface UserGuitar {
+    name: string;
     id: number;
     serial_number: number;
     serial_number_location: string;

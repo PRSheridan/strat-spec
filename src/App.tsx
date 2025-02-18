@@ -1,7 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom"
 import NavBar from './components/NavBar'
 import Feed from './pages/Feed'
-import { GuitarProvider } from "./context/GuitarContext"
+import { ItemProvider } from "./context/ItemContext"
 
 function App() {
   const location = useLocation()
@@ -12,9 +12,9 @@ function App() {
       <NavBar />
       {showGuitarFeed && <Feed />}
       <main>
-        <GuitarProvider >
+        <ItemProvider >
           <Outlet />
-        </GuitarProvider>
+        </ItemProvider>
       </main>
     </>
   )

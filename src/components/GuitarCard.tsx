@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useGuitar } from '../context/GuitarContext'
+import { useItem } from '../context/ItemContext'
 import { UserGuitar, Model } from '../types'
 
 interface GuitarCardProps {
@@ -8,15 +8,15 @@ interface GuitarCardProps {
 }
 
 function GuitarCard({ item, viewMode }: GuitarCardProps) {
-    const { setGuitar } = useGuitar()
+    const { setItem } = useItem()
     const navigate = useNavigate()
 
     function handleSelectItem(item: UserGuitar | Model) {
+        setItem(item)
         if ('serial_number' in item) {
-            setGuitar(item)
-            navigate(`/specs/${item.serial_number}`)
+            navigate(`/guitar/${item.serial_number}`)
         } else {
-            navigate(`/models/${item.model_name}`)
+            navigate(`/model/${item.model_name.replace(" ", "_")}`)
         }
     }
 
