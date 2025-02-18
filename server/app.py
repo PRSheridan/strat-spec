@@ -150,14 +150,16 @@ class Models(Resource):
             db.session.rollback()
             return {'error': str(e)}, 400
 
-class ModelByID(Resource):
-    def get(self, model_id):
-        model = Model.query.get(model_id)
+class ModelByName(Resource):
+    def get(self, model_name):
+        model_name = model_name.replace("_", " ")
+        model = Model.query.filter_by(model_name=model_name).first()
         return (model_schema.dump(model), 200) if model else ({'error': 'Model not found'}, 404)
 
-    def put(self, model_id):
+    def put(self, model_name):
+        model_name = model_name.replace("_", " ")
         data = request.get_json()
-        model = Model.query.get(model_id)
+        model = Model.query.filter_by(model_name=model_name).first()
         if not model:
             return {'error': 'Model not found'}, 404
         try:
@@ -171,8 +173,9 @@ class ModelByID(Resource):
         except Exception as e:
             return {'error': str(e)}, 400
 
-    def delete(self, model_id):
-        model = Model.query.get(model_id)
+    def delete(self, model_name):
+        model_name = model_name.replace("_", " ")
+        model = Model.query.filter_by(model_name=model_name).first()
         if not model:
             return {'error': 'Model not found'}, 404
         db.session.delete(model)
@@ -188,7 +191,7 @@ api.add_resource(UserByID, '/api/user/<int:user_id>')
 api.add_resource(Guitars, '/api/guitars')
 api.add_resource(GuitarBySN, '/api/guitar/<string:serial_number>')
 api.add_resource(Models, '/api/models')
-api.add_resource(ModelByID, '/api/model/<int:model_id>')
+api.add_resource(ModelByName, '/api/model/<string:model_name>')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

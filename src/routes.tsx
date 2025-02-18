@@ -27,7 +27,7 @@ const routes = [
         element: <Specs />
       },
       {
-        path: "/model/:model_name",
+        path: "/model/:modelName",
         element: <Specs />
       },
       {
