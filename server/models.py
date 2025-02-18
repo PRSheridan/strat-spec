@@ -184,6 +184,21 @@ class UserGuitar(db.Model):
 
     images = db.relationship('Image', secondary=user_guitar_images, back_populates='user_guitars')
 
+    def __init__(self, *args, **kwargs):
+        """Override initialization to set the name if unmodified and model exists."""
+        super().__init__(*args, **kwargs)
+        if not self.modified and self.model:
+            self.name = self.model.model_name
+
+    @property
+    def display_name(self):
+        if not self.modified and self.model:
+            if self.name != self.model.name:
+                self.name = self.model.name
+                db.session.commit()
+            return self.model.name
+        return self.name or "Unnamed Guitar"
+
 # Guitar Attributes
 # Body Model
 class Body(db.Model):

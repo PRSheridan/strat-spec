@@ -89,3 +89,4 @@ pickguard (ply_count, screws, configuration, color)
 other 
 pickup_model (name, type, magnet, output, poles, cover)
 
+If a guitar has a model and is not modified, the name should be the model.
