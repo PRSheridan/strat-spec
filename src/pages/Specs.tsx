@@ -3,55 +3,55 @@ import { useEffect } from "react"
 import { useItem } from "../context/ItemContext"
 import { Model, UserGuitar } from "../types"
 
+import SpecSheet from "../components/SpecSheet"
+
 function Specs() {
     const { item, setItem } = useItem()
     const { modelName, serialNumber } = useParams()
 
     useEffect(() => {
+        //details on page load (always trigger)
         console.log("Effect triggered")
         console.log("Current item:", item)
         console.log("Params - Model:", modelName, "Serial:", serialNumber)
     
-        if (!item && (modelName || serialNumber)) {
+        if (!item || isMismatch(item)) {
             const apiPath = serialNumber
-                ? `/api/guitar/${serialNumber}`
+                ? `/api/guitar/${parseInt(serialNumber!)}`
                 : `/api/model/${modelName}`
-    
+            
+            //Retrieve guitar data (only trigger on refresh)
             console.log("Fetching from API:", apiPath)
-    
+
             fetch(apiPath)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`)
-                    }
-                    return response.json()
-                })
+                .then(response => response.json())
                 .then((data: Model | UserGuitar) => {
                     console.log("Fetched data:", data)
                     setItem(data)
                 })
                 .catch(error => console.error("Error fetching item:", error))
         }
-    }, [item, modelName, serialNumber, setItem])
-    
+    }, [modelName, serialNumber, setItem])
+
+    function isMismatch(data: Model | UserGuitar) {
+        if (serialNumber && "serial_number" in data) {
+            return data.serial_number.toString() !== serialNumber
+        }
+        if (modelName && "model_name" in data) {
+            return data.model_name !== modelName
+        }
+        return false
+    }
 
     if (!item) return <p>Loading...</p>
-
     return (
         <div id="guitar-specs">
-            {"serial_number" in item ? (
-                <>
-                    <h1>{item.serial_number}</h1>
-                    <p>Model: {item.model ? item.model.model_name : "Unknown"}</p>
-                </>
-            ) : (
-                <>
-                    <h1>{item.model_name}</h1>
-                    <p>Official Model</p>
-                </>
-            )}
+            <SpecSheet 
+                item={item} 
+                type={serialNumber ? "userGuitar" : "model"} 
+            />
         </div>
-    );
+    )
 }
 
 export default Specs
