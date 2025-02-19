@@ -33,9 +33,9 @@ function SpecSheet({ item, type }: SpecSheetProps) {
 
                 <div className="spec-sheet-sub">
                     <h2>Body</h2>
-                    <p>Wood: {model.body.wood}</p>
-                    <p>Finish: {model.body.finish}</p>
-                    <p>Color: {model.body.color}</p>
+                    <p>Wood: </p>
+                    <p>Finish: </p>
+                    <p>Color: </p>
                 </div>
 
                 <div className="spec-sheet-sub">
@@ -43,16 +43,16 @@ function SpecSheet({ item, type }: SpecSheetProps) {
                     <p>Neck Wood: {model.neck.wood}</p>
                     <p>Neck Shape: {model.neck.shape}</p>
                     <p>Scale Length: {model.neck.scale_length} inches</p>
-                    <p>Fretboard Material: {model.fretboard.material}</p>
-                    <p>Fretboard Radius: {model.fretboard.radius} inches</p>
+                    <p>Fretboard Material: </p>
+                    <p>Fretboard Radius: </p>
                 </div>
 
                 <div className="spec-sheet-sub">
                     <h2>Bridge & Pickguard</h2>
                     <p>Bridge Model: {model.bridge.model}</p>
                     <p>Bridge Spacing: {model.bridge.spacing} mm</p>
-                    <p>Pickguard Ply Count: {model.pickguard.ply_count}</p>
-                    <p>Pickguard Color: {model.pickguard.color}</p>
+                    <p>Pickguard Ply Count: </p>
+                    <p>Pickguard Color: </p>
                 </div>
             </div>
             <div>pictures here</div>

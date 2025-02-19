@@ -1,35 +1,46 @@
+export interface User {
+    id: number;
+    username: string;
+    email: string;
+    role: string;
+    user_guitars: UserGuitar[];
+}
+
 export interface Model {
     id: number;
+    brand: string;
     model_name: string;
     year_range: string;
     country: string;
     scale_length: number;
-    hardware_finish: string;
     relic: string;
+    other_controls: string;
+    hardware_finish: string[]; 
+    pickup_configuration: string[];
 
-    pickup_configuration: string;
     pickups: GuitarPickup[];
+    bodies: Body[];
+    fretboards: Fretboard[];
+    pickguards: Pickguard[];
+    switches: Switch[];
+    controls: Controls[];
 
-    body: Body;
     neck: Neck;
     headstock: Headstock;
-    fretboard: Fretboard;
     nut: Nut;
     frets: Frets;
     inlays: Inlays;
     bridge: Bridge;
     saddles: Saddles;
-    switch: Switch;
-    controls: Controls;
-    other_controls: string;
     tuning_machine: TuningMachine;
     string_tree: StringTree;
     neck_plate: NeckPlate;
-    pickguard: Pickguard;
+    
 }
 
 export interface UserGuitar {
     id: number;
+    brand: string;
     name: string;
     serial_number: string;
     serial_number_location: string;
@@ -37,33 +48,34 @@ export interface UserGuitar {
     country: string;
     weight: string;
     scale_length: number;
+    other_controls: string;
     hardware_finish: string;
     relic: string;
     modified: boolean;
     modifications: string;
+    pickup_configuration: string;
 
+    pickups: GuitarPickup[];
     owner: User;
     model?: Model | null;
-
-    pickup_configuration: string;
-    pickups: GuitarPickup[];
-
+    
     body: Body;
+    fretboard: Fretboard;
+    pickguard: Pickguard;
+    switch: Switch;
+    controls: Controls;
+    
     neck: Neck;
     headstock: Headstock;
-    fretboard: Fretboard;
-    frets: Frets;
     nut: Nut;
+    frets: Frets;
     inlays: Inlays;
     bridge: Bridge;
     saddles: Saddles;
-    switch: Switch;
-    controls: Controls;
-    other_controls: string;
     tuning_machine: TuningMachine;
     string_tree: StringTree;
     neck_plate: NeckPlate;
-    pickguard: Pickguard;
+    
 }
 
 export interface GuitarPickup {
@@ -195,12 +207,4 @@ export interface Pickguard {
     screws: number;
     configuration: string;
     color: string;
-}
-
-export interface User {
-    id: number;
-    username: string;
-    email: string;
-    role: string;
-    user_guitars: UserGuitar[];
 }
