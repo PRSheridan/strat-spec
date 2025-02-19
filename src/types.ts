@@ -3,10 +3,12 @@ export interface Model {
     model_name: string;
     year_range: string;
     country: string;
-    pickup_configuration: string;
-    other_controls: string;
+    scale_length: number;
     hardware_finish: string;
     relic: string;
+
+    pickup_configuration: string;
+    pickups: GuitarPickup[];
 
     body: Body;
     neck: Neck;
@@ -19,6 +21,7 @@ export interface Model {
     saddles: Saddles;
     switch: Switch;
     controls: Controls;
+    other_controls: string;
     tuning_machine: TuningMachine;
     string_tree: StringTree;
     neck_plate: NeckPlate;
@@ -26,38 +29,64 @@ export interface Model {
 }
 
 export interface UserGuitar {
-    name: string;
     id: number;
-    serial_number: number;
+    name: string;
+    serial_number: string;
     serial_number_location: string;
-    year: string;
+    year: number;
     country: string;
-    weight: number;
-    pickup_configuration: string;
-    other_controls: string;
+    weight: string;
+    scale_length: number;
     hardware_finish: string;
+    relic: string;
     modified: boolean;
     modifications: string;
-    relic: string;
 
     owner: User;
     model?: Model | null;
+
+    pickup_configuration: string;
+    pickups: GuitarPickup[];
 
     body: Body;
     neck: Neck;
     headstock: Headstock;
     fretboard: Fretboard;
-    nut: Nut;
     frets: Frets;
+    nut: Nut;
     inlays: Inlays;
     bridge: Bridge;
     saddles: Saddles;
     switch: Switch;
     controls: Controls;
+    other_controls: string;
     tuning_machine: TuningMachine;
     string_tree: StringTree;
     neck_plate: NeckPlate;
     pickguard: Pickguard;
+}
+
+export interface GuitarPickup {
+    id: number;
+    guitar: UserGuitar | Model;
+    pickup: Pickup;
+    position: "Neck" | "Middle" | "Bridge" | "Any";
+}
+
+export interface Pickup {
+    id: number;
+    brand: string;
+    model: string; 
+    position: string[];
+    type: string; 
+    magnet: string; 
+    resistance: number;
+    inductance: number;
+    active: boolean;
+    noiseless: boolean;
+    staggered_poles: boolean;
+    wax_potted: boolean;
+    cover: string;
 }
 
 export interface Body {
@@ -65,6 +94,8 @@ export interface Body {
     wood: string;
     contour: string;
     routing: string;
+    chambering: boolean;
+    binding: boolean;
     finish: string;
     color: string;
 }
@@ -74,7 +105,7 @@ export interface Neck {
     wood: string;
     finish: string;
     shape: string;
-    scale_length: string;
+    scale_length: number;
     truss_rod: string;
 }
 
@@ -88,21 +119,23 @@ export interface Headstock {
 export interface Fretboard {
     id: number;
     material: string;
-    radius: string;
-}
-
-export interface Nut {
-    id: number;
-    width: string;
-    material: string;
-    locking: boolean;
+    radius: number;
+    fret_count: number;
+    binding: boolean;
+    scalloped: boolean;
 }
 
 export interface Frets {
     id: number;
-    count: number;
     material: string;
     size: string;
+}
+
+export interface Nut {
+    id: number;
+    width: number;
+    material: string;
+    locking: boolean;
 }
 
 export interface Inlays {
@@ -116,7 +149,8 @@ export interface Bridge {
     id: number;
     model: string;
     screws: number;
-    spacing: string;
+    spacing: number;
+    tremolo: boolean;
 }
 
 export interface Saddles {
