@@ -1,6 +1,6 @@
 #models.py
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.types import JSON
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import validates
 from config import db, bcrypt
@@ -88,6 +88,15 @@ class User(db.Model):
     def __repr__(self):
         return f'<User {self.id}, {self.username}>'
     
+# Image Model
+class Image(db.Model):
+    __tablename__ = 'image'
+
+    id = db.Column(db.Integer, primary_key=True)
+    file_path = db.Column(db.String, nullable=False)
+
+    # Relationships
+    user_guitars = db.relationship('UserGuitar', secondary=user_guitar_images, back_populates='images')
 
 class Model(db.Model):
     __tablename__ = 'model'
@@ -100,11 +109,12 @@ class Model(db.Model):
     scale_length = db.Column(db.Float, nullable=False)
     relic = db.Column(db.String, nullable=False)
     other_controls = db.Column(db.String, nullable=False)
-    hardware_finish = db.Column(db.ARRAY, nullable=False)
-    pickup_configuration = db.Column(db.ARRAY, nullable=False)
+    hardware_finish = db.Column(JSON, nullable=False)
+    pickup_configuration = db.Column(JSON, nullable=False)
+
 
     # Many-to-Many Relationships (Variations)
-    pickups = db.relationship('GuitarPickup', secondary='model_pickups', back_populates='model')
+    pickups = db.relationship('GuitarPickup', secondary='model_pickups', back_populates='models')
     bodies = db.relationship('Body', secondary='model_body', back_populates='models')
     fretboards = db.relationship('Fretboard', secondary='model_fretboard', back_populates='models')
     pickguards = db.relationship('Pickguard', secondary='model_pickguard', back_populates='models')
@@ -113,39 +123,37 @@ class Model(db.Model):
 
     # Many-to-One Relationships (Fixed parts of the model)
     neck_id = db.Column(db.Integer, db.ForeignKey('neck.id'), nullable=False)
-    neck = db.relationship('Neck', back_populates='model')
+    neck = db.relationship('Neck', back_populates='models')
 
     headstock_id = db.Column(db.Integer, db.ForeignKey('headstock.id'), nullable=False)
-    headstock = db.relationship('Headstock', back_populates='model')
+    headstock = db.relationship('Headstock', back_populates='models')
 
     nut_id = db.Column(db.Integer, db.ForeignKey('nut.id'), nullable=False)
-    nut = db.relationship('Nut', back_populates='model')
+    nut = db.relationship('Nut', back_populates='models')
 
     frets_id = db.Column(db.Integer, db.ForeignKey('frets.id'), nullable=False)
-    frets = db.relationship('Frets', back_populates='model')
+    frets = db.relationship('Frets', back_populates='models')
 
     inlays_id = db.Column(db.Integer, db.ForeignKey('inlays.id'), nullable=False)
-    inlays = db.relationship('Inlays', back_populates='model')
+    inlays = db.relationship('Inlays', back_populates='models')
 
     bridge_id = db.Column(db.Integer, db.ForeignKey('bridge.id'), nullable=False)
-    bridge = db.relationship('Bridge', back_populates='model')
+    bridge = db.relationship('Bridge', back_populates='models')
 
     saddles_id = db.Column(db.Integer, db.ForeignKey('saddles.id'), nullable=False)
-    saddles = db.relationship('Saddles', back_populates='model')
+    saddles = db.relationship('Saddles', back_populates='models')
 
     tuning_machine_id = db.Column(db.Integer, db.ForeignKey('tuning_machine.id'), nullable=False)
-    tuning_machine = db.relationship('TuningMachine', back_populates='model')
+    tuning_machine = db.relationship('TuningMachine', back_populates='models')
 
     string_tree_id = db.Column(db.Integer, db.ForeignKey('string_tree.id'), nullable=False)
-    string_tree = db.relationship('StringTree', back_populates='model')
+    string_tree = db.relationship('StringTree', back_populates='models')
 
     neck_plate_id = db.Column(db.Integer, db.ForeignKey('neck_plate.id'), nullable=False)
-    neck_plate = db.relationship('NeckPlate', back_populates='model')
+    neck_plate = db.relationship('NeckPlate', back_populates='models')
 
     # One-to-Many: Model → UserGuitar
     user_guitars = db.relationship('UserGuitar', back_populates='model', lazy=True)
-
-
 
 class UserGuitar(db.Model):
     __tablename__ = 'user_guitar'
@@ -239,8 +247,27 @@ class UserGuitar(db.Model):
         """Returns the model's name if unmodified, otherwise the guitar's name."""
         return self.model.model_name if not self.modified and self.model else self.name or "Unnamed Guitar"
 
-
 # Guitar Attributes
+class GuitarPickup(db.Model):
+    __tablename__ = "guitar_pickup"
+
+    id = db.Column(db.Integer, primary_key=True)
+    brand = db.Column(db.String, nullable=False)
+    model = db.Column(db.String, nullable=False)
+    position = db.Column(JSON, nullable=False)  # Multiple positions (Neck, Middle, Bridge)
+    type = db.Column(db.String, nullable=False)  # Single-coil, Humbucker, etc.
+    magnet = db.Column(db.String, nullable=False)  # Alnico V, Ceramic, etc.
+    resistance = db.Column(db.Float, nullable=False)  # Measured in kΩ
+    inductance = db.Column(db.Float, nullable=False)  # Measured in Henries
+    active = db.Column(db.Boolean, default=False)
+    noiseless = db.Column(db.Boolean, default=False)
+    staggered_poles = db.Column(db.Boolean, default=False)
+    wax_potted = db.Column(db.Boolean, default=False)
+    cover = db.Column(db.String, nullable=True)
+
+    # Relationships
+    models = db.relationship('Model', secondary=model_pickups, back_populates='pickups')
+    user_guitars = db.relationship('UserGuitar', secondary=user_guitar_pickups, back_populates='pickups')
 
 # Body Model
 class Body(db.Model):
@@ -250,6 +277,8 @@ class Body(db.Model):
     wood = db.Column(db.String, nullable=False)
     contour = db.Column(db.String, nullable=False)
     routing = db.Column(db.String, nullable=False)
+    chambering = db.Column(db.Boolean, nullable=False)
+    binding = db.Column(db.Boolean, nullable=False)
     finish = db.Column(db.String, nullable=False)
     color = db.Column(db.String, nullable=False)
 
@@ -258,7 +287,6 @@ class Body(db.Model):
 
     # One-to-Many with UserGuitar
     user_guitars = db.relationship('UserGuitar', back_populates='body')
-
 
 # Neck Model
 class Neck(db.Model):
@@ -273,7 +301,6 @@ class Neck(db.Model):
     models = db.relationship('Model', back_populates='neck')
     user_guitars = db.relationship('UserGuitar', back_populates='neck')
 
-
 # Headstock Model
 class Headstock(db.Model):
     __tablename__ = 'headstock'
@@ -285,7 +312,6 @@ class Headstock(db.Model):
 
     models = db.relationship('Model', back_populates='headstock')
     user_guitars = db.relationship('UserGuitar', back_populates='headstock')
-
 
 # Fretboard Model
 class Fretboard(db.Model):
@@ -304,7 +330,6 @@ class Fretboard(db.Model):
     # One-to-Many with UserGuitar
     user_guitars = db.relationship('UserGuitar', back_populates='fretboard')
 
-
 # Frets Model
 class Frets(db.Model):
     __tablename__ = 'frets'
@@ -315,7 +340,6 @@ class Frets(db.Model):
 
     models = db.relationship('Model', back_populates='frets')
     user_guitars = db.relationship('UserGuitar', back_populates='frets')
-
 
 # Nut Model
 class Nut(db.Model):
@@ -329,7 +353,6 @@ class Nut(db.Model):
     models = db.relationship('Model', back_populates='nut')
     user_guitars = db.relationship('UserGuitar', back_populates='nut')
 
-
 # Inlays Model
 class Inlays(db.Model):
     __tablename__ = 'inlays'
@@ -341,7 +364,6 @@ class Inlays(db.Model):
 
     models = db.relationship('Model', back_populates='inlays')
     user_guitars = db.relationship('UserGuitar', back_populates='inlays')
-
 
 # Bridge Model
 class Bridge(db.Model):
@@ -356,7 +378,6 @@ class Bridge(db.Model):
     models = db.relationship('Model', back_populates='bridge')
     user_guitars = db.relationship('UserGuitar', back_populates='bridge')
 
-
 # Saddles Model
 class Saddles(db.Model):
     __tablename__ = 'saddles'
@@ -367,7 +388,6 @@ class Saddles(db.Model):
 
     models = db.relationship('Model', back_populates='saddles')
     user_guitars = db.relationship('UserGuitar', back_populates='saddles')
-
 
 # Switch Model
 class Switch(db.Model):
@@ -383,7 +403,6 @@ class Switch(db.Model):
     # One-to-Many with UserGuitar
     user_guitars = db.relationship('UserGuitar', back_populates='switch')
 
-
 # Controls Model
 class Controls(db.Model):
     __tablename__ = 'controls'
@@ -398,7 +417,6 @@ class Controls(db.Model):
     # One-to-Many with UserGuitar
     user_guitars = db.relationship('UserGuitar', back_populates='controls')
 
-
 # Tuning Machine Model
 class TuningMachine(db.Model):
     __tablename__ = 'tuning_machine'
@@ -409,7 +427,6 @@ class TuningMachine(db.Model):
 
     models = db.relationship('Model', back_populates='tuning_machine')
     user_guitars = db.relationship('UserGuitar', back_populates='tuning_machine')
-
 
 # String Tree Model
 class StringTree(db.Model):
@@ -422,7 +439,6 @@ class StringTree(db.Model):
     models = db.relationship('Model', back_populates='string_tree')
     user_guitars = db.relationship('UserGuitar', back_populates='string_tree')
 
-
 # Neck Plate Model
 class NeckPlate(db.Model):
     __tablename__ = 'neck_plate'
@@ -433,7 +449,6 @@ class NeckPlate(db.Model):
 
     models = db.relationship('Model', back_populates='neck_plate')
     user_guitars = db.relationship('UserGuitar', back_populates='neck_plate')
-
 
 # Pickguard Model
 class Pickguard(db.Model):
@@ -450,14 +465,3 @@ class Pickguard(db.Model):
 
     # One-to-Many with UserGuitar
     user_guitars = db.relationship('UserGuitar', back_populates='pickguard')
-
-# Image Model
-class Image(db.Model):
-    __tablename__ = 'image'
-
-    id = db.Column(db.Integer, primary_key=True)
-    file_path = db.Column(db.String, nullable=False)
-    guitar_id = db.Column(db.Integer, db.ForeignKey('user_guitar.id'), nullable=False)
-
-    # Relationships
-    user_guitars = db.relationship('UserGuitar', secondary=user_guitar_images, back_populates='images')

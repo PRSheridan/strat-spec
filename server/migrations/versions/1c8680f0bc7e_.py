@@ -1,8 +1,8 @@
-"""initial migration
+"""empty message
 
-Revision ID: ab1ab29c8539
+Revision ID: 1c8680f0bc7e
 Revises: 
-Create Date: 2025-02-18 09:53:07.443923
+Create Date: 2025-02-20 15:27:20.222384
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ab1ab29c8539'
+revision = '1c8680f0bc7e'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -23,6 +23,8 @@ def upgrade():
     sa.Column('wood', sa.String(), nullable=False),
     sa.Column('contour', sa.String(), nullable=False),
     sa.Column('routing', sa.String(), nullable=False),
+    sa.Column('chambering', sa.Boolean(), nullable=False),
+    sa.Column('binding', sa.Boolean(), nullable=False),
     sa.Column('finish', sa.String(), nullable=False),
     sa.Column('color', sa.String(), nullable=False),
     sa.PrimaryKeyConstraint('id')
@@ -32,6 +34,7 @@ def upgrade():
     sa.Column('model', sa.String(), nullable=False),
     sa.Column('screws', sa.Integer(), nullable=False),
     sa.Column('spacing', sa.Integer(), nullable=False),
+    sa.Column('tremolo', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('controls',
@@ -44,13 +47,31 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('material', sa.String(), nullable=False),
     sa.Column('radius', sa.String(), nullable=False),
+    sa.Column('fret_count', sa.Integer(), nullable=False),
+    sa.Column('binding', sa.Boolean(), nullable=True),
+    sa.Column('scalloped', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('frets',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('count', sa.Integer(), nullable=False),
     sa.Column('material', sa.String(), nullable=False),
     sa.Column('size', sa.String(), nullable=False),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('guitar_pickup',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('brand', sa.String(), nullable=False),
+    sa.Column('model', sa.String(), nullable=False),
+    sa.Column('position', sa.JSON(), nullable=False),
+    sa.Column('type', sa.String(), nullable=False),
+    sa.Column('magnet', sa.String(), nullable=False),
+    sa.Column('resistance', sa.Float(), nullable=False),
+    sa.Column('inductance', sa.Float(), nullable=False),
+    sa.Column('active', sa.Boolean(), nullable=True),
+    sa.Column('noiseless', sa.Boolean(), nullable=True),
+    sa.Column('staggered_poles', sa.Boolean(), nullable=True),
+    sa.Column('wax_potted', sa.Boolean(), nullable=True),
+    sa.Column('cover', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('headstock',
@@ -58,6 +79,11 @@ def upgrade():
     sa.Column('shape', sa.String(), nullable=False),
     sa.Column('decal_style', sa.String(), nullable=False),
     sa.Column('reverse', sa.Boolean(), nullable=True),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('image',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('file_path', sa.String(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('inlays',
@@ -72,7 +98,6 @@ def upgrade():
     sa.Column('wood', sa.String(), nullable=False),
     sa.Column('finish', sa.String(), nullable=False),
     sa.Column('shape', sa.String(), nullable=False),
-    sa.Column('scale_length', sa.String(), nullable=False),
     sa.Column('truss_rod', sa.String(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
@@ -131,59 +156,97 @@ def upgrade():
     )
     op.create_table('model',
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('brand', sa.String(), nullable=False),
     sa.Column('model_name', sa.String(), nullable=False),
     sa.Column('year_range', sa.String(), nullable=False),
     sa.Column('country', sa.String(), nullable=False),
-    sa.Column('pickup_configuration', sa.String(), nullable=False),
-    sa.Column('other_controls', sa.String(), nullable=False),
-    sa.Column('hardware_finish', sa.String(), nullable=False),
+    sa.Column('scale_length', sa.Float(), nullable=False),
     sa.Column('relic', sa.String(), nullable=False),
-    sa.Column('body_id', sa.Integer(), nullable=False),
+    sa.Column('other_controls', sa.String(), nullable=False),
+    sa.Column('hardware_finish', sa.JSON(), nullable=False),
+    sa.Column('pickup_configuration', sa.JSON(), nullable=False),
     sa.Column('neck_id', sa.Integer(), nullable=False),
     sa.Column('headstock_id', sa.Integer(), nullable=False),
-    sa.Column('fretboard_id', sa.Integer(), nullable=False),
     sa.Column('nut_id', sa.Integer(), nullable=False),
     sa.Column('frets_id', sa.Integer(), nullable=False),
     sa.Column('inlays_id', sa.Integer(), nullable=False),
     sa.Column('bridge_id', sa.Integer(), nullable=False),
     sa.Column('saddles_id', sa.Integer(), nullable=False),
-    sa.Column('switch_id', sa.Integer(), nullable=False),
-    sa.Column('controls_id', sa.Integer(), nullable=False),
     sa.Column('tuning_machine_id', sa.Integer(), nullable=False),
     sa.Column('string_tree_id', sa.Integer(), nullable=False),
     sa.Column('neck_plate_id', sa.Integer(), nullable=False),
-    sa.Column('pickguard_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['body_id'], ['body.id'], name=op.f('fk_model_body_id_body')),
     sa.ForeignKeyConstraint(['bridge_id'], ['bridge.id'], name=op.f('fk_model_bridge_id_bridge')),
-    sa.ForeignKeyConstraint(['controls_id'], ['controls.id'], name=op.f('fk_model_controls_id_controls')),
-    sa.ForeignKeyConstraint(['fretboard_id'], ['fretboard.id'], name=op.f('fk_model_fretboard_id_fretboard')),
     sa.ForeignKeyConstraint(['frets_id'], ['frets.id'], name=op.f('fk_model_frets_id_frets')),
     sa.ForeignKeyConstraint(['headstock_id'], ['headstock.id'], name=op.f('fk_model_headstock_id_headstock')),
     sa.ForeignKeyConstraint(['inlays_id'], ['inlays.id'], name=op.f('fk_model_inlays_id_inlays')),
     sa.ForeignKeyConstraint(['neck_id'], ['neck.id'], name=op.f('fk_model_neck_id_neck')),
     sa.ForeignKeyConstraint(['neck_plate_id'], ['neck_plate.id'], name=op.f('fk_model_neck_plate_id_neck_plate')),
     sa.ForeignKeyConstraint(['nut_id'], ['nut.id'], name=op.f('fk_model_nut_id_nut')),
-    sa.ForeignKeyConstraint(['pickguard_id'], ['pickguard.id'], name=op.f('fk_model_pickguard_id_pickguard')),
     sa.ForeignKeyConstraint(['saddles_id'], ['saddles.id'], name=op.f('fk_model_saddles_id_saddles')),
     sa.ForeignKeyConstraint(['string_tree_id'], ['string_tree.id'], name=op.f('fk_model_string_tree_id_string_tree')),
-    sa.ForeignKeyConstraint(['switch_id'], ['switch.id'], name=op.f('fk_model_switch_id_switch')),
     sa.ForeignKeyConstraint(['tuning_machine_id'], ['tuning_machine.id'], name=op.f('fk_model_tuning_machine_id_tuning_machine')),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('model_body',
+    sa.Column('model_id', sa.Integer(), nullable=False),
+    sa.Column('body_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['body_id'], ['body.id'], name=op.f('fk_model_body_body_id_body')),
+    sa.ForeignKeyConstraint(['model_id'], ['model.id'], name=op.f('fk_model_body_model_id_model')),
+    sa.PrimaryKeyConstraint('model_id', 'body_id')
+    )
+    op.create_table('model_controls',
+    sa.Column('model_id', sa.Integer(), nullable=False),
+    sa.Column('controls_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['controls_id'], ['controls.id'], name=op.f('fk_model_controls_controls_id_controls')),
+    sa.ForeignKeyConstraint(['model_id'], ['model.id'], name=op.f('fk_model_controls_model_id_model')),
+    sa.PrimaryKeyConstraint('model_id', 'controls_id')
+    )
+    op.create_table('model_fretboard',
+    sa.Column('model_id', sa.Integer(), nullable=False),
+    sa.Column('fretboard_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['fretboard_id'], ['fretboard.id'], name=op.f('fk_model_fretboard_fretboard_id_fretboard')),
+    sa.ForeignKeyConstraint(['model_id'], ['model.id'], name=op.f('fk_model_fretboard_model_id_model')),
+    sa.PrimaryKeyConstraint('model_id', 'fretboard_id')
+    )
+    op.create_table('model_pickguard',
+    sa.Column('model_id', sa.Integer(), nullable=False),
+    sa.Column('pickguard_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['model_id'], ['model.id'], name=op.f('fk_model_pickguard_model_id_model')),
+    sa.ForeignKeyConstraint(['pickguard_id'], ['pickguard.id'], name=op.f('fk_model_pickguard_pickguard_id_pickguard')),
+    sa.PrimaryKeyConstraint('model_id', 'pickguard_id')
+    )
+    op.create_table('model_pickups',
+    sa.Column('model_id', sa.Integer(), nullable=False),
+    sa.Column('pickup_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['model_id'], ['model.id'], name=op.f('fk_model_pickups_model_id_model')),
+    sa.ForeignKeyConstraint(['pickup_id'], ['guitar_pickup.id'], name=op.f('fk_model_pickups_pickup_id_guitar_pickup')),
+    sa.PrimaryKeyConstraint('model_id', 'pickup_id')
+    )
+    op.create_table('model_switch',
+    sa.Column('model_id', sa.Integer(), nullable=False),
+    sa.Column('switch_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['model_id'], ['model.id'], name=op.f('fk_model_switch_model_id_model')),
+    sa.ForeignKeyConstraint(['switch_id'], ['switch.id'], name=op.f('fk_model_switch_switch_id_switch')),
+    sa.PrimaryKeyConstraint('model_id', 'switch_id')
+    )
     op.create_table('user_guitar',
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('brand', sa.String(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
-    sa.Column('serial_number', sa.Integer(), nullable=False),
+    sa.Column('serial_number', sa.String(), nullable=False),
     sa.Column('serial_number_location', sa.String(), nullable=False),
-    sa.Column('year', sa.String(), nullable=False),
+    sa.Column('year', sa.Integer(), nullable=False),
     sa.Column('country', sa.String(), nullable=False),
-    sa.Column('weight', sa.Integer(), nullable=False),
-    sa.Column('pickup_configuration', sa.String(), nullable=False),
-    sa.Column('other_controls', sa.String(), nullable=False),
+    sa.Column('scale_length', sa.Float(), nullable=False),
+    sa.Column('weight', sa.String(), nullable=False),
+    sa.Column('relic', sa.String(), nullable=False),
+    sa.Column('other_controls', sa.String(), nullable=True),
     sa.Column('hardware_finish', sa.String(), nullable=False),
     sa.Column('modified', sa.Boolean(), nullable=True),
     sa.Column('modifications', sa.String(), nullable=True),
-    sa.Column('relic', sa.String(), nullable=False),
+    sa.Column('pickup_configuration', sa.String(), nullable=False),
+    sa.Column('model_id', sa.Integer(), nullable=True),
+    sa.Column('owner_id', sa.Integer(), nullable=False),
     sa.Column('body_id', sa.Integer(), nullable=True),
     sa.Column('neck_id', sa.Integer(), nullable=True),
     sa.Column('headstock_id', sa.Integer(), nullable=True),
@@ -199,8 +262,6 @@ def upgrade():
     sa.Column('string_tree_id', sa.Integer(), nullable=True),
     sa.Column('neck_plate_id', sa.Integer(), nullable=True),
     sa.Column('pickguard_id', sa.Integer(), nullable=True),
-    sa.Column('model_id', sa.Integer(), nullable=True),
-    sa.Column('owner_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['body_id'], ['body.id'], name=op.f('fk_user_guitar_body_id_body')),
     sa.ForeignKeyConstraint(['bridge_id'], ['bridge.id'], name=op.f('fk_user_guitar_bridge_id_bridge')),
     sa.ForeignKeyConstraint(['controls_id'], ['controls.id'], name=op.f('fk_user_guitar_controls_id_controls')),
@@ -220,13 +281,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['tuning_machine_id'], ['tuning_machine.id'], name=op.f('fk_user_guitar_tuning_machine_id_tuning_machine')),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('image',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('file_path', sa.String(), nullable=False),
-    sa.Column('guitar_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['guitar_id'], ['user_guitar.id'], name=op.f('fk_image_guitar_id_user_guitar')),
-    sa.PrimaryKeyConstraint('id')
-    )
     op.create_table('user_guitar_images',
     sa.Column('user_guitar_id', sa.Integer(), nullable=False),
     sa.Column('image_id', sa.Integer(), nullable=False),
@@ -234,14 +288,27 @@ def upgrade():
     sa.ForeignKeyConstraint(['user_guitar_id'], ['user_guitar.id'], name=op.f('fk_user_guitar_images_user_guitar_id_user_guitar')),
     sa.PrimaryKeyConstraint('user_guitar_id', 'image_id')
     )
+    op.create_table('user_guitar_pickups',
+    sa.Column('user_guitar_id', sa.Integer(), nullable=False),
+    sa.Column('pickup_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['pickup_id'], ['guitar_pickup.id'], name=op.f('fk_user_guitar_pickups_pickup_id_guitar_pickup')),
+    sa.ForeignKeyConstraint(['user_guitar_id'], ['user_guitar.id'], name=op.f('fk_user_guitar_pickups_user_guitar_id_user_guitar')),
+    sa.PrimaryKeyConstraint('user_guitar_id', 'pickup_id')
+    )
     # ### end Alembic commands ###
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_table('user_guitar_pickups')
     op.drop_table('user_guitar_images')
-    op.drop_table('image')
     op.drop_table('user_guitar')
+    op.drop_table('model_switch')
+    op.drop_table('model_pickups')
+    op.drop_table('model_pickguard')
+    op.drop_table('model_fretboard')
+    op.drop_table('model_controls')
+    op.drop_table('model_body')
     op.drop_table('model')
     op.drop_table('user')
     op.drop_table('tuning_machine')
@@ -253,7 +320,9 @@ def downgrade():
     op.drop_table('neck_plate')
     op.drop_table('neck')
     op.drop_table('inlays')
+    op.drop_table('image')
     op.drop_table('headstock')
+    op.drop_table('guitar_pickup')
     op.drop_table('frets')
     op.drop_table('fretboard')
     op.drop_table('controls')

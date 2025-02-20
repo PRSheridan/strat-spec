@@ -117,7 +117,6 @@ export interface Neck {
     wood: string;
     finish: string;
     shape: string;
-    scale_length: number;
     truss_rod: string;
 }
 
