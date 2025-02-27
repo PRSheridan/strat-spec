@@ -4,7 +4,8 @@ from sqlalchemy.types import JSON
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import validates
 from werkzeug.utils import secure_filename
-import datetime, re, os, io, zipfile
+import re, os, io, zipfile
+from datetime import datetime
 from config import db, bcrypt, app
 
 user_guitar_images = db.Table(
@@ -184,9 +185,10 @@ class Model(db.Model):
     model_name = db.Column(db.String(100), nullable=False)
     year_range = db.Column(db.String(20), nullable=False)
     country = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.String, nullable=True)
     scale_length = db.Column(db.Float, nullable=False)
     relic = db.Column(db.String(50), nullable=False)
-    other_controls = db.Column(db.String(255), nullable=True)
+    other_controls = db.Column(JSON, nullable=True)
     hardware_finish = db.Column(JSON, nullable=False)
     pickup_configuration = db.Column(JSON, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -291,14 +293,15 @@ class UserGuitar(db.Model):
     serial_number_location = db.Column(db.String, nullable=False)
     year = db.Column(db.Integer, nullable=True)
     country = db.Column(db.String, nullable=False)
+    description = db.Column(db.String, nullable=True)
     scale_length = db.Column(db.Float, nullable=True)
     weight = db.Column(db.String, nullable=True)
     relic = db.Column(db.String, nullable=False)
     other_controls = db.Column(db.String, nullable=True)
     hardware_finish = db.Column(db.String, nullable=True)
+    pickup_configuration = db.Column(db.String, nullable=False)
     modified = db.Column(db.Boolean, default=False)
     modifications = db.Column(db.String, nullable=True)
-    pickup_configuration = db.Column(db.String, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -372,7 +375,7 @@ class UserGuitar(db.Model):
     @validates('year')
     def validate_year(self, key, year):
         if year is not None:
-            current_year = datetime.now().year
+            current_year = datetime.utcnow().year
             if not (1930 <= year <= current_year):
                 raise ValueError(f"Year must be between 1930 and {current_year}")
         return year
@@ -412,12 +415,8 @@ class GuitarPickup(db.Model):
     position = db.Column(JSON, nullable=False)
     type = db.Column(db.String, nullable=False)
     magnet = db.Column(db.String, nullable=True)
-    resistance = db.Column(db.Float, nullable=True)
-    inductance = db.Column(db.Float, nullable=True)
-    active = db.Column(db.Boolean, default=None, nullable=True)
-    noiseless = db.Column(db.Boolean, default=None, nullable=True)
-    staggered_poles = db.Column(db.Boolean, default=None, nullable=True)
-    wax_potted = db.Column(db.Boolean, default=None, nullable=True)
+    active = db.Column(db.Boolean, nullable=True)
+    noiseless = db.Column(db.Boolean, nullable=True)
     cover = db.Column(db.String, nullable=True)
 
     # Relationships
@@ -426,7 +425,11 @@ class GuitarPickup(db.Model):
     
     @validates('type')
     def validate_type(self, key, type_val):
-        valid_types = ['Single-coil', 'Humbucker', 'P90', 'Lipstick', 'Piezo', 'Mini-humbucker', 'Other']
+        valid_types = [
+            'Single-coil', 'Humbucker', 'Hot Rails', 'Noiseless', 'Lace Sensor',
+            'P90', 'Mini-humbucker', 'Active', 'Lipstick', 'Rail', 'Vintage', 
+            'Texas Special', 'Custom Shop', 'Other'
+        ]
         if type_val not in valid_types:
             raise ValueError(f"Pickup type must be one of: {', '.join(valid_types)}")
         return type_val
@@ -456,7 +459,7 @@ class Body(db.Model):
     wood = db.Column(db.String, nullable=True)
     contour = db.Column(db.String, nullable=True)
     routing = db.Column(db.String, nullable=True)
-    chambering = db.Column(db.Boolean, default=None, nullable=True)
+    chambering = db.Column(db.Boolean, nullable=True)
     binding = db.Column(db.Boolean, nullable=False)
     finish = db.Column(db.String, nullable=False)
     color = db.Column(db.String, nullable=False)

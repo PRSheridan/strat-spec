@@ -16,6 +16,10 @@ class UserSchema(SQLAlchemyAutoSchema):
     username = fields.String()
     email = fields.String()
     role = fields.String()
+    is_active = fields.Boolean()
+    last_login = fields.DateTime(allow_none=True)
+    created_at = fields.DateTime()
+    updated_at = fields.DateTime()
     user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=['owner'])))
 
 
@@ -26,7 +30,11 @@ class ImageSchema(SQLAlchemyAutoSchema):
         ordered = True
 
     id = fields.Integer()
+    file_name = fields.String()
+    caption = fields.String(allow_none=True)
     file_path = fields.String()
+    created_at = fields.DateTime()
+    updated_at = fields.DateTime()
 
 
 class ModelSchema(SQLAlchemyAutoSchema):
@@ -40,11 +48,14 @@ class ModelSchema(SQLAlchemyAutoSchema):
     model_name = fields.String()
     year_range = fields.String()
     country = fields.String()
+    description = fields.String(allow_none=True)
     scale_length = fields.Float()
     relic = fields.String()
-    other_controls = fields.String()
-    hardware_finish = fields.List(fields.String())  # Fixed for ARRAY(db.String)
-    pickup_configuration = fields.List(fields.String())  # Fixed for ARRAY(db.String)
+    other_controls = fields.Dict(allow_none=True)  # Changed from String to Dict for JSON
+    hardware_finish = fields.Dict()  # Changed from List to Dict for JSON
+    pickup_configuration = fields.Dict()  # Changed from List to Dict for JSON
+    created_at = fields.DateTime()
+    updated_at = fields.DateTime()
 
     pickups = fields.List(fields.Nested(lambda: GuitarPickupSchema(exclude=["models"])))
     bodies = fields.List(fields.Nested(lambda: BodySchema(exclude=["models", "user_guitars"])))
@@ -78,16 +89,19 @@ class UserGuitarSchema(SQLAlchemyAutoSchema):
     name = fields.String()
     serial_number = fields.String()
     serial_number_location = fields.String()
-    year = fields.Integer()
+    year = fields.Integer(allow_none=True)
     country = fields.String()
-    scale_length = fields.Float()
-    weight = fields.String()
+    description = fields.String(allow_none=True)
+    scale_length = fields.Float(allow_none=True)
+    weight = fields.String(allow_none=True)
     relic = fields.String()
-    other_controls = fields.String()
-    hardware_finish = fields.List(fields.String())  # Fixed for ARRAY(db.String)
+    other_controls = fields.String(allow_none=True)
+    hardware_finish = fields.String(allow_none=True)  # Changed to String
     modified = fields.Boolean()
     modifications = fields.String(allow_none=True)
-    pickup_configuration = fields.List(fields.String())  # Fixed for ARRAY(db.String)
+    pickup_configuration = fields.String()  # Changed to String
+    created_at = fields.DateTime()
+    updated_at = fields.DateTime()
 
     pickups = fields.List(fields.Nested(lambda: GuitarPickupSchema(exclude=["user_guitars"])))
     owner = fields.Nested(lambda: UserSchema(exclude=["user_guitars"]))
@@ -119,17 +133,13 @@ class GuitarPickupSchema(SQLAlchemyAutoSchema):
         ordered = True
 
     id = fields.Integer()
-    brand = fields.String()
-    model = fields.String()
-    position = fields.List(fields.String())
+    brand = fields.String(allow_none=True)
+    model = fields.String(allow_none=True)
+    position = fields.Dict()  # Changed from List to Dict for JSON
     type = fields.String()
-    magnet = fields.String()
-    resistance = fields.Float()
-    inductance = fields.Float()
-    active = fields.Boolean()
-    noiseless = fields.Boolean()
-    staggered_poles = fields.Boolean()
-    wax_potted = fields.Boolean()
+    magnet = fields.String(allow_none=True)
+    active = fields.Boolean(allow_none=True)  # Removed resistance, inductance, etc.
+    noiseless = fields.Boolean(allow_none=True)
     cover = fields.String(allow_none=True)
 
     models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["pickups"])))
@@ -143,10 +153,10 @@ class BodySchema(SQLAlchemyAutoSchema):
         ordered = True
 
     id = fields.Integer()
-    wood = fields.String()
-    contour = fields.String()
-    routing = fields.String()
-    chambering = fields.Boolean()
+    wood = fields.String(allow_none=True)
+    contour = fields.String(allow_none=True)
+    routing = fields.String(allow_none=True)
+    chambering = fields.Boolean(allow_none=True)
     binding = fields.Boolean()
     finish = fields.String()
     color = fields.String()
@@ -162,11 +172,10 @@ class NeckSchema(SQLAlchemyAutoSchema):
         ordered = True
 
     id = fields.Integer()
-    wood = fields.String()
+    wood = fields.String(allow_none=True)
     finish = fields.String()
-    shape = fields.String()
-    scale_length = fields.Float()
-    truss_rod = fields.String()
+    shape = fields.String(allow_none=True)
+    truss_rod = fields.String(allow_none=True)
 
     models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["neck"])))
     user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["neck"])))
@@ -179,8 +188,8 @@ class HeadstockSchema(SQLAlchemyAutoSchema):
         ordered = True
 
     id = fields.Integer()
-    shape = fields.String()
-    decal_style = fields.String()
+    shape = fields.String(allow_none=True)
+    decal_style = fields.String(allow_none=True)
     reverse = fields.Boolean()
 
     models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["headstock"])))
@@ -195,7 +204,7 @@ class FretboardSchema(SQLAlchemyAutoSchema):
 
     id = fields.Integer()
     material = fields.String()
-    radius = fields.String()
+    radius = fields.String(allow_none=True)
     fret_count = fields.Integer()
     binding = fields.Boolean()
     scalloped = fields.Boolean()
@@ -211,8 +220,8 @@ class NutSchema(SQLAlchemyAutoSchema):
         ordered = True
 
     id = fields.Integer()
-    width = fields.String()
-    material = fields.String()
+    width = fields.String(allow_none=True)
+    material = fields.String(allow_none=True)
     locking = fields.Boolean()
 
     models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["nut"])))
@@ -226,8 +235,8 @@ class FretsSchema(SQLAlchemyAutoSchema):
         ordered = True
 
     id = fields.Integer()
-    material = fields.String()
-    size = fields.String()
+    material = fields.String(allow_none=True)
+    size = fields.String(allow_none=True)
 
     models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["frets"])))
     user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["frets"])))
@@ -240,9 +249,9 @@ class InlaysSchema(SQLAlchemyAutoSchema):
         ordered = True
 
     id = fields.Integer()
-    shape = fields.String()
-    material = fields.String()
-    spacing = fields.Integer()
+    shape = fields.String(allow_none=True)
+    material = fields.String(allow_none=True)
+    spacing = fields.String(allow_none=True)  # Changed from Integer to String
 
     models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["inlays"])))
     user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["inlays"])))
@@ -255,9 +264,9 @@ class BridgeSchema(SQLAlchemyAutoSchema):
         ordered = True
 
     id = fields.Integer()
-    model = fields.String()
+    model = fields.String(allow_none=True)
     screws = fields.Integer()
-    spacing = fields.Integer()
+    spacing = fields.Integer(allow_none=True)
     tremolo = fields.Boolean()
 
     models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["bridge"])))
@@ -272,7 +281,7 @@ class SaddlesSchema(SQLAlchemyAutoSchema):
 
     id = fields.Integer()
     style = fields.String()
-    material = fields.String()
+    material = fields.String(allow_none=True)
 
     models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["saddles"])))
     user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["saddles"])))
@@ -313,7 +322,7 @@ class TuningMachineSchema(SQLAlchemyAutoSchema):
         ordered = True
 
     id = fields.Integer()
-    model = fields.String()
+    model = fields.String(allow_none=True)
     locking = fields.Boolean()
 
     models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["tuning_machine"])))
@@ -327,7 +336,7 @@ class StringTreeSchema(SQLAlchemyAutoSchema):
         ordered = True
 
     id = fields.Integer()
-    model = fields.String()
+    model = fields.String(allow_none=True)
     count = fields.Integer()
 
     models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["string_tree"])))
@@ -343,6 +352,7 @@ class NeckPlateSchema(SQLAlchemyAutoSchema):
     id = fields.Integer()
     style = fields.String()
     bolts = fields.Integer()
+    details = fields.String(allow_none=True)
 
     models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["neck_plate"])))
     user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["neck_plate"])))
@@ -355,9 +365,8 @@ class PickguardSchema(SQLAlchemyAutoSchema):
         ordered = True
 
     id = fields.Integer()
-    ply_count = fields.Integer()
+    ply_count = fields.Integer(allow_none=True)
     screws = fields.Integer()
-    configuration = fields.String()
     color = fields.String()
 
     models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["pickguards"])))
