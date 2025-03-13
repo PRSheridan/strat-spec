@@ -4,11 +4,15 @@ from faker import Faker
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash
 
+from flask_migrate import upgrade
+from flask_migrate import init, migrate
+import os
+
 from app import app
 from models import (
     db, User, GuitarPickup, Body, Neck, Headstock, Fretboard, Frets, Nut,
     Inlays, Bridge, Saddles, Switch, Controls, TuningMachine, StringTree, 
-    NeckPlate, Pickguard, Model
+    NeckPlate, Pickguard, Model, UserGuitar
 )
 
 fake = Faker()
@@ -55,12 +59,14 @@ def create_guitar_pickups(num_pickups=15):
 
     valid_covers = ['None', 'Chrome', 'Nickel', 'Gold', 'Black', 'Cream', 'Zebra', 'Other', None]
 
+    valid_pickup_models = ["Texas Special", "Vintage Noiseless", "Fat 50s", "Lace Sensor Gold"]
+
     pickups = []
     for _ in range(num_pickups):
         pickup = GuitarPickup(
             brand=fake.company() if randint(0, 1) else None,
-            model=fake.word().capitalize() if randint(0, 1) else None,
-            position=json.dumps(sample(["Neck", "Middle", "Bridge"], randint(1, 3))),
+            model=choice(valid_pickup_models) if randint(0, 1) else None,
+            position=sample(["Neck", "Middle", "Bridge"], randint(1, 3)),
             type=choice(valid_types),
             magnet=choice(valid_magnets),
             active=choice([True, False, None]),
@@ -366,20 +372,49 @@ def create_models(num_models=10):
     valid_relics = ['None', 'Light', 'Medium', 'Heavy', 'Custom']
     valid_hardware_finishes = ['Chrome', 'Nickel', 'Gold', 'Black', 'Other']
     valid_pickup_configurations = ['SSS', 'HSS', 'HH', 'HSH', 'HS', 'Other']
+    valid_model_names = [
+        "Stratocaster",
+        "American Standard",
+        "Deluxe",
+        "Player Series",
+        "Custom Shop '62",
+        "American Vintage '59",
+        "American Vintage '62",
+        "American Vintage '65",
+        "American Professional",
+        "American Ultra",
+        "American Performer",
+        "Vintera '50s Stratocaster",
+        "Vintera '60s Stratocaster",
+        "Vintera '70s Stratocaster",
+        "Eric Clapton Signature",
+        "Jimi Hendrix Signature",
+        "David Gilmour Signature",
+        "Jeff Beck Signature",
+        "SRV Signature",
+        "American Special",
+        "Highway One",
+        "American Original '50s",
+        "American Original '60s",
+        "American Original '70s",
+        "Custom Shop '50s",
+        "Custom Shop '60s",
+        "Custom Shop '70s",
+    ]
 
     models = []
     for _ in range(num_models):
         model = Model(
             brand="Fender",
-            model_name=fake.word().capitalize(),
+            model_name = choice(valid_model_names),
             year_range=f"{randint(1950, 2020)}-{choice([str(randint(1951, 2023)), 'present'])}",
             country=choice(valid_countries),
             description=fake.sentence(),
             scale_length=round(uniform(20.0, 30.0), 1),
             relic=choice(valid_relics),
-            other_controls=json.dumps(sample(["Blend Knob", "Kill Switch", "Mid Boost"], randint(0, 2))),
-            hardware_finish=json.dumps(sample(valid_hardware_finishes, randint(1, 3))),
-            pickup_configuration=json.dumps(sample(valid_pickup_configurations, randint(1, 3))),
+            other_controls=sample(["Blend Knob", "Kill Switch", "Mid Boost"], randint(0, 2)),
+            hardware_finish=sample(valid_hardware_finishes, randint(1, 3)),
+            pickup_configuration=sample(valid_pickup_configurations, randint(1, 3)),
             neck=choice(Neck.query.all()),
             headstock=choice(Headstock.query.all()),
             nut=choice(Nut.query.all()),
@@ -391,6 +426,9 @@ def create_models(num_models=10):
             string_tree=choice(StringTree.query.all()),
             neck_plate=choice(NeckPlate.query.all())
         )
+
+        db.session.add(model)
+        db.session.flush()
 
         # Many-to-Many Relationships (Variations)
         model.pickups = sample(GuitarPickup.query.all(), randint(1, 3))
@@ -406,8 +444,109 @@ def create_models(num_models=10):
     db.session.commit()
     return models
 
+def create_user_guitars(num_guitars=15):
+    """Generate user-created guitars with valid attributes and relationships."""
+    valid_countries = ['USA', 'Mexico', 'Japan', 'China', 'Indonesia', 'Korea', 'Custom']
+    valid_relics = ['None', 'Light', 'Medium', 'Heavy', 'Custom']
+    valid_serial_number_locations = ['Headstock', 'Neck Plate', 'Body Cavity', 'Other']
+    valid_prefixes = ["MX", "US", "CN", "J", "I", "A", "B", "C", "D", "E", "F"]
+    valid_pickup_configurations = ['SSS', 'HSS', 'HH', 'HSH', 'HS', 'Other']
+
+    user_guitars = []
+    users = User.query.all()
+    models = Model.query.all()
+
+    # Ensure valid relationships
+    bodies = Body.query.all()
+    necks = Neck.query.all()
+    headstocks = Headstock.query.all()
+    fretboards = Fretboard.query.all()
+    nuts = Nut.query.all()
+    frets = Frets.query.all()
+    inlays = Inlays.query.all()
+    bridges = Bridge.query.all()
+    saddles = Saddles.query.all()
+    switches = Switch.query.all()
+    controls = Controls.query.all()
+    tuning_machines = TuningMachine.query.all()
+    string_trees = StringTree.query.all()
+    neck_plates = NeckPlate.query.all()
+    pickguards = Pickguard.query.all()
+
+    for _ in range(num_guitars):
+        owner = choice(users)
+        assigned_model = choice(models) if models and randint(0, 1) else None
+
+        modified = choice([True, False])
+        modifications = fake.sentence() if modified else None
+
+        user_guitar = UserGuitar(
+            brand="Fender",
+            name=fake.word().capitalize(),
+            serial_number = f"{choice(valid_prefixes)}{randint(10, 23)}{fake.bothify('#####')}",
+            serial_number_location=choice(valid_serial_number_locations),
+            year=randint(1930, datetime.utcnow().year) if randint(0, 1) else None,
+            country=choice(valid_countries),
+            description=fake.sentence() if randint(0, 1) else None,
+            scale_length=round(uniform(20.0, 30.0), 1) if randint(0, 1) else None,
+            weight=f"{round(uniform(6.0, 10.0), 1)} lbs" if randint(0, 1) else None,
+            relic=choice(valid_relics),
+            other_controls=fake.sentence() if randint(0, 1) else None,
+            hardware_finish=choice(['Chrome', 'Nickel', 'Gold', 'Black', 'Other']) if randint(0, 1) else None,
+            pickup_configuration=choice(valid_pickup_configurations),
+            modified=modified,
+            modifications=modifications,
+            owner=owner,
+            model=assigned_model,
+        )
+
+        # Assign relationships AFTER adding but BEFORE flush
+        user_guitar.body = choice(bodies) if bodies else None
+        user_guitar.neck = choice(necks) if necks else None
+        user_guitar.headstock = choice(headstocks) if headstocks else None
+        user_guitar.fretboard = choice(fretboards) if fretboards else None
+        user_guitar.nut = choice(nuts) if nuts else None
+        user_guitar.frets = choice(frets) if frets else None
+        user_guitar.inlays = choice(inlays) if inlays else None
+        user_guitar.bridge = choice(bridges) if bridges else None
+        user_guitar.saddles = choice(saddles) if saddles else None
+        user_guitar.switch = choice(switches) if switches else None
+        user_guitar.controls = choice(controls) if controls else None
+        user_guitar.tuning_machine = choice(tuning_machines) if tuning_machines else None
+        user_guitar.string_tree = choice(string_trees) if string_trees else None
+        user_guitar.neck_plate = choice(neck_plates) if neck_plates else None
+        user_guitar.pickguard = choice(pickguards) if pickguards else None
+
+        # Many-to-Many Relationships
+        user_guitar.pickups = sample(GuitarPickup.query.all(), randint(1, 3))
+
+        db.session.add(user_guitar)
+        db.session.flush()
+
+        user_guitars.append(user_guitar)
+
+    db.session.commit()
+    return user_guitars
+
+
 if __name__ == "__main__":
     with app.app_context():
+        print("Seeding database...")
+
+        
+        # Check if the migrations folder exists before initializing
+        if not os.path.exists("migrations"):
+            print("Running 'flask db init'...")
+            init()
+
+        # Run migrations
+        print("Running 'flask db migrate'...")
+        migrate()
+
+        # Apply migrations
+        print("Running 'flask db upgrade'...")
+        upgrade()
+
         print("Seeding database...")
 
         create_users()
@@ -428,5 +567,6 @@ if __name__ == "__main__":
         create_neck_plates()
         create_pickguards()
         create_models()
+        create_user_guitars()
 
         print("Database seeding complete!")

@@ -387,12 +387,6 @@ class UserGuitar(db.Model):
             raise ValueError(f"Country must be one of: {', '.join(valid_countries)}")
         return value
 
-    @validates('modified')
-    def validate_modified(self, key, value):
-        if value is True and self.modifications in (None, ''):
-            raise ValueError("Modifications must be specified when a guitar is marked as modified")
-        return value
-
     def sync_name_with_model(self):
         """Update the name to the model's name if it hasn't been modified."""
         if not self.modified and self.model and self.name != self.model.model_name:
