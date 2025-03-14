@@ -17,7 +17,10 @@ from models import (
 
 fake = Faker()
 
-def create_users(num_users=10):
+user_guitar_amt = 40
+user_amt = 10
+
+def create_users(num_users=user_amt):
     """Generate users with all required attributes."""
     users = []
     for _ in range(num_users):
@@ -444,7 +447,7 @@ def create_models(num_models=10):
     db.session.commit()
     return models
 
-def create_user_guitars(num_guitars=15):
+def create_user_guitars(num_guitars=user_guitar_amt):
     """Generate user-created guitars with valid attributes and relationships."""
     valid_countries = ['USA', 'Mexico', 'Japan', 'China', 'Indonesia', 'Korea', 'Custom']
     valid_relics = ['None', 'Light', 'Medium', 'Heavy', 'Custom']
@@ -499,6 +502,9 @@ def create_user_guitars(num_guitars=15):
             owner=owner,
             model=assigned_model,
         )
+
+        db.session.add(user_guitar)  # Add to session first
+        db.session.flush()  # Force SQLAlchemy to assign an ID
 
         # Assign relationships AFTER adding but BEFORE flush
         user_guitar.body = choice(bodies) if bodies else None

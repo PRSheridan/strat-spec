@@ -46,8 +46,8 @@ function GuitarCard({ item, viewMode }: GuitarCardProps) {
                         <>
                             <div>Years: {item.year_range}</div>
                             <div>Country: {item.country}</div>
-                            <div>Body Wood: {item.body.wood}</div>
-                            <div>Fretboard: {item.fretboard.material}</div>
+                            <div>Body Wood: {item.bodies.map((body) => body.wood).join(", ")}</div>
+                            <div>Fretboard: {item.fretboards.map((fretboard) => fretboard.material).join(", ")}</div>
                             <div>Bridge: {item.bridge.model}</div>
                             <div>Pickups: {item.pickup_configuration}</div>
                         </>

@@ -310,7 +310,8 @@ class UserGuitar(db.Model):
     model = db.relationship('Model', back_populates='user_guitars')
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     owner = db.relationship('User', back_populates='user_guitars')
-
+    images = db.relationship('Image', secondary=user_guitar_images, back_populates='user_guitars')
+    
     # Relationships to components
     body_id = db.Column(db.Integer, db.ForeignKey('body.id'))
     body = db.relationship('Body', back_populates='user_guitars')
@@ -356,8 +357,6 @@ class UserGuitar(db.Model):
 
     pickguard_id = db.Column(db.Integer, db.ForeignKey('pickguard.id'))
     pickguard = db.relationship('Pickguard', back_populates='user_guitars')
-
-    images = db.relationship('Image', secondary=user_guitar_images, back_populates='user_guitars')
 
     def __init__(self, *args, **kwargs):
         """Set name to model name if unmodified and model exists upon creation."""

@@ -1,3 +1,4 @@
+import json
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from marshmallow import fields
 from models import (
@@ -5,6 +6,20 @@ from models import (
     Bridge, Saddles, Switch, Controls, TuningMachine, StringTree, NeckPlate, Pickguard,
     GuitarPickup
 )
+
+class ImageSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Image
+        load_instance = True
+        ordered = True
+
+    id = fields.Integer()
+    file_name = fields.String()
+    caption = fields.String(allow_none=True)
+    file_path = fields.String()
+    created_at = fields.DateTime()
+    updated_at = fields.DateTime()
+
 
 class UserSchema(SQLAlchemyAutoSchema):
     class Meta:
@@ -23,25 +38,35 @@ class UserSchema(SQLAlchemyAutoSchema):
     user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=['owner'])))
 
 
-class ImageSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = Image
-        load_instance = True
-        ordered = True
-
-    id = fields.Integer()
-    file_name = fields.String()
-    caption = fields.String(allow_none=True)
-    file_path = fields.String()
-    created_at = fields.DateTime()
-    updated_at = fields.DateTime()
-
-
 class ModelSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Model
         load_instance = True
         ordered = True
+
+    def get_other_controls(self, obj):
+        if isinstance(obj.other_controls, str):
+            try:
+                return json.loads(obj.other_controls)
+            except json.JSONDecodeError:
+                return {}
+        return obj.other_controls or {}
+
+    def get_hardware_finish(self, obj):
+        if isinstance(obj.hardware_finish, str):
+            try:
+                return json.loads(obj.hardware_finish)
+            except json.JSONDecodeError:
+                return {}
+        return obj.hardware_finish or {}
+
+    def get_pickup_configuration(self, obj):
+        if isinstance(obj.pickup_configuration, str):
+            try:
+                return json.loads(obj.pickup_configuration)
+            except json.JSONDecodeError:
+                return {}
+        return obj.pickup_configuration or {}
 
     id = fields.Integer()
     brand = fields.String()
@@ -51,9 +76,9 @@ class ModelSchema(SQLAlchemyAutoSchema):
     description = fields.String(allow_none=True)
     scale_length = fields.Float()
     relic = fields.String()
-    other_controls = fields.Dict(allow_none=True)  # Changed from String to Dict for JSON
-    hardware_finish = fields.Dict()  # Changed from List to Dict for JSON
-    pickup_configuration = fields.Dict()  # Changed from List to Dict for JSON
+    other_controls = fields.Method("get_other_controls")
+    hardware_finish = fields.Method("get_hardware_finish")
+    pickup_configuration = fields.Method("get_pickup_configuration")
     created_at = fields.DateTime()
     updated_at = fields.DateTime()
 
@@ -75,7 +100,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
     string_tree = fields.Nested(lambda: StringTreeSchema(exclude=["models", "user_guitars"]))
     neck_plate = fields.Nested(lambda: NeckPlateSchema(exclude=["models", "user_guitars"]))
 
-    user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["model"])))
+    user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(only=["id", "name", "year"])))
 
 
 class UserGuitarSchema(SQLAlchemyAutoSchema):
@@ -105,7 +130,7 @@ class UserGuitarSchema(SQLAlchemyAutoSchema):
 
     pickups = fields.List(fields.Nested(lambda: GuitarPickupSchema(exclude=["user_guitars"])))
     owner = fields.Nested(lambda: UserSchema(exclude=["user_guitars"]))
-    model = fields.Nested(lambda: ModelSchema(exclude=["user_guitars"]))
+    model = fields.Nested(lambda: ModelSchema(only=["id", "model_name", "year_range"]))
 
     body = fields.Nested(lambda: BodySchema(exclude=["models", "user_guitars"]))
     neck = fields.Nested(lambda: NeckSchema(exclude=["models", "user_guitars"]))
@@ -132,10 +157,18 @@ class GuitarPickupSchema(SQLAlchemyAutoSchema):
         load_instance = True
         ordered = True
 
+    def get_positions(self, obj):
+        if isinstance(obj.position, str):
+            try:
+                return json.loads(obj.position)
+            except json.JSONDecodeError:
+                return {}
+        return obj.position or {}
+
     id = fields.Integer()
     brand = fields.String(allow_none=True)
     model = fields.String(allow_none=True)
-    position = fields.Dict()  # Changed from List to Dict for JSON
+    position = fields.Method("get_positions")    
     type = fields.String()
     magnet = fields.String(allow_none=True)
     active = fields.Boolean(allow_none=True)  # Removed resistance, inductance, etc.
