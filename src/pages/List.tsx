@@ -6,10 +6,6 @@ interface ListProps {
     type: 'models' | 'guitars';
 }
 
-// List the items based on the URL. 
-// Models nad Guitars have slightly different displays handled by the GuitarCard
-//
-
 function List({ type }: ListProps) {
     const [items, setItems] = useState<(Model | UserGuitar)[]>([]);
     const [viewMode, setViewMode] = useState<'compact' | 'detailed'>('detailed');

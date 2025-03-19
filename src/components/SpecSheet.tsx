@@ -16,43 +16,42 @@ function SpecSheet({ item, type }: SpecSheetProps) {
                 <p>Year Range: {model.year_range}</p>
             </div>
             <div className="spec-sheet-about">
-                space for accurate description of the model
+                {model.description}
             </div>
             <div className="spec-sheet">
                 <div className="spec-sheet-sub">
                     <h2>Electronics</h2>
-                    <p>Pickup Configuration: {model.pickup_configuration}</p>
-                    <p>Other Controls: {model.other_controls || "None"}</p>
+                    <p>Pickup Configuration: {model.pickup_configuration.length > 0 ? model.pickup_configuration.join(", ") : "None"}</p>
+                    <p>Other Controls: {model.other_controls?.length > 0 ? model.other_controls.join(", ") : "None"}</p>
                 </div>
 
                 <div className="spec-sheet-sub">
                     <h2>Finish & Hardware</h2>
-                    <p>Hardware Finish: {model.hardware_finish}</p>
-                    <p>Relic: {model.relic || "None"}</p>
+                    <p>Hardware Finish: {model.hardware_finish.length > 0 ? model.hardware_finish.join(", ") : "None"}</p>
+                    <p>Relic: {model.relic ?? "None"}</p>
                 </div>
 
                 <div className="spec-sheet-sub">
                     <h2>Body</h2>
-                    <p>Wood: </p>
-                    <p>Finish: </p>
-                    <p>Color: </p>
+                    <p>Wood: {model.bodies?.map((body) => body.wood || "Unknown").join(", ") || "N/A"}</p>
+                    <p>Finish: {model.bodies?.map((body) => body.finish || "Unknown").join(", ") || "N/A"}</p>
+                    <p>Color: {model.bodies?.map((body) => body.color || "Unknown").join(", ") || "N/A"}</p>
                 </div>
 
                 <div className="spec-sheet-sub">
                     <h2>Neck & Fretboard</h2>
-                    <p>Neck Wood: {model.neck.wood}</p>
-                    <p>Neck Shape: {model.neck.shape}</p>
-                    <p>Scale Length: {model.neck.scale_length} inches</p>
-                    <p>Fretboard Material: </p>
-                    <p>Fretboard Radius: </p>
+                    <p>Neck Wood: {model.neck.wood ?? "N/A"}</p>
+                    <p>Neck Shape: {model.neck.shape ?? "N/A"}</p>
+                    <p>Fretboard Material: {model.fretboards?.map((fb) => fb.material || "Unknown").join(", ") || "N/A"}</p>
+                    <p>Fretboard Radius: {model.fretboards?.map((fb) => fb.radius || "Unknown").join(", ") || "N/A"}</p>
                 </div>
 
                 <div className="spec-sheet-sub">
                     <h2>Bridge & Pickguard</h2>
-                    <p>Bridge Model: {model.bridge.model}</p>
-                    <p>Bridge Spacing: {model.bridge.spacing} mm</p>
-                    <p>Pickguard Ply Count: </p>
-                    <p>Pickguard Color: </p>
+                    <p>Bridge Model: {model.bridge.model ?? "N/A"}</p>
+                    <p>Bridge Spacing: {model.bridge.spacing ? `${model.bridge.spacing} mm` : "N/A"}</p>
+                    <p>Pickguard Ply Count: {model.pickguards?.map((pg) => pg.ply_count || "Unknown").join(", ") || "N/A"}</p>
+                    <p>Pickguard Color: {model.pickguards?.map((pg) => pg.color || "Unknown").join(", ") || "N/A"}</p>
                 </div>
             </div>
             <div>pictures here</div>
@@ -67,55 +66,54 @@ function SpecSheet({ item, type }: SpecSheetProps) {
                 <p>Serial Number: {guitar.serial_number}</p>
                 <p>Owner: {guitar.owner.username}</p>
                 <p>Country: {guitar.country}</p>
-                <p>Year: {guitar.year}</p>
+                <p>Year: {guitar.year ?? "N/A"}</p>
             </div>
             <div className="spec-sheet-about">
-                space for an owner to include details about their guitar
+                {guitar.description}
             </div>
             <div className="spec-sheet">
                 <div className="spec-sheet-sub">
                     <h2>Ownership & Customization</h2>
                     <p>Serial Number Location: {guitar.serial_number_location}</p>
-                    <p>Weight: {guitar.weight} lbs</p>
+                    <p>Weight: {guitar.weight ?? "N/A"} lbs</p>
                     <p>Modified: {guitar.modified ? "Yes" : "No"}</p>
-                    {guitar.modified && <p>Modifications: {guitar.modifications}</p>}
+                    {guitar.modified && <p>Modifications: {guitar.modifications ?? "N/A"}</p>}
                     {guitar.model && <p>Based on Model: {guitar.model.model_name}</p>}
                 </div>
 
                 <div className="spec-sheet-sub">
                     <h2>Electronics</h2>
                     <p>Pickup Configuration: {guitar.pickup_configuration}</p>
-                    <p>Other Controls: {guitar.other_controls || "None"}</p>
+                    <p>Other Controls: {guitar.other_controls ?? "None"}</p>
                 </div>
 
                 <div className="spec-sheet-sub">
                     <h2>Finish & Hardware</h2>
-                    <p>Hardware Finish: {guitar.hardware_finish}</p>
-                    <p>Relic: {guitar.relic || "None"}</p>
+                    <p>Hardware Finish: {guitar.hardware_finish ?? "N/A"}</p>
+                    <p>Relic: {guitar.relic ?? "None"}</p>
                 </div>
 
                 <div className="spec-sheet-sub">
                     <h2>Body</h2>
-                    <p>Wood: {guitar.body.wood}</p>
-                    <p>Finish: {guitar.body.finish}</p>
-                    <p>Color: {guitar.body.color}</p>
+                    <p>Wood: {guitar.body.wood ?? "N/A"}</p>
+                    <p>Finish: {guitar.body.finish ?? "N/A"}</p>
+                    <p>Color: {guitar.body.color ?? "N/A"}</p>
                 </div>
 
                 <div className="spec-sheet-sub">
                     <h2>Neck & Fretboard</h2>
-                    <p>Neck Wood: {guitar.neck.wood}</p>
-                    <p>Neck Shape: {guitar.neck.shape}</p>
-                    <p>Scale Length: {guitar.neck.scale_length} inches</p>
-                    <p>Fretboard Material: {guitar.fretboard.material}</p>
-                    <p>Fretboard Radius: {guitar.fretboard.radius} inches</p>
+                    <p>Neck Wood: {guitar.neck.wood ?? "N/A"}</p>
+                    <p>Neck Shape: {guitar.neck.shape ?? "N/A"}</p>
+                    <p>Fretboard Material: {guitar.fretboard.material ?? "N/A"}</p>
+                    <p>Fretboard Radius: {guitar.fretboard.radius ?? "N/A"} inches</p>
                 </div>
 
                 <div className="spec-sheet-sub">
                     <h2>Bridge & Pickguard</h2>
-                    <p>Bridge Model: {guitar.bridge.model}</p>
-                    <p>Bridge Spacing: {guitar.bridge.spacing} mm</p>
-                    <p>Pickguard Ply Count: {guitar.pickguard.ply_count}</p>
-                    <p>Pickguard Color: {guitar.pickguard.color}</p>
+                    <p>Bridge Model: {guitar.bridge.model ?? "N/A"}</p>
+                    <p>Bridge Spacing: {guitar.bridge.spacing ? `${guitar.bridge.spacing} mm` : "N/A"}</p>
+                    <p>Pickguard Ply Count: {guitar.pickguard.ply_count ?? "N/A"}</p>
+                    <p>Pickguard Color: {guitar.pickguard.color ?? "N/A"}</p>
                 </div>
             </div>
             <div>pictures here</div>
@@ -125,3 +123,4 @@ function SpecSheet({ item, type }: SpecSheetProps) {
 }
 
 export default SpecSheet;
+

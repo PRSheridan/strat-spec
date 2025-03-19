@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {useForm, SubmitHandler} from "react-hook-form"
+import { UserGuitar } from "../../types";
 
-function SearchForm () {
+function GuitarForm () {
     const navigate = useNavigate()
     const [SN, setSN] = useState("")
 
@@ -24,4 +26,4 @@ function SearchForm () {
     )
 }
 
-export default SearchForm
+export default GuitarForm

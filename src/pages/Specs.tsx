@@ -17,7 +17,7 @@ function Specs() {
     
         if (!item || isMismatch(item)) {
             const apiPath = serialNumber
-                ? `/api/guitar/${parseInt(serialNumber!)}`
+                ? `/api/guitar/${serialNumber}`
                 : `/api/model/${modelName}`
             
             //Retrieve guitar data (only trigger on refresh)

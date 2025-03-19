@@ -78,7 +78,7 @@ class UserByID(Resource):
 
 class Guitars(Resource):
     def get(self):
-        return guitar_schema.dump(UserGuitar.query.order_by(func.random()).all(), many=True), 200
+        return guitar_schema.dump(UserGuitar.query.all(), many=True), 200
     
     def post(self):
         data = request.get_json()
