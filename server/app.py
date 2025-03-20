@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # app.py
-from flask import request, session
+from flask import request, session, jsonify
 from flask_restful import Resource
 from marshmallow import ValidationError
 #temporary randomization of UserGuitars
 from sqlalchemy.sql.expression import func
+
 
 from config import app, db, api
 from models import User, Image, UserGuitar, Model
@@ -183,6 +184,25 @@ class ModelByName(Resource):
         db.session.delete(model)
         db.session.commit()
         return {}, 204
+    
+#specific guitar parts for GuitarForm:
+class Countries(Resource):
+    def get(self):
+        countries = db.session.query(UserGuitar.country).distinct().all()
+        country_list = [country[0] for country in countries]  # Extract values from tuples
+        return country_list, 200
+    
+class SerialNumberLocations(Resource):
+    def get(self):
+        locations = db.session.query(UserGuitar.serial_number_location).distinct().all()
+        location_list = [location[0] for location in locations]  # Extract values from tuples
+        return location_list, 200
+    
+class Brands(Resource):
+    def get(self):
+        brands = db.session.query(UserGuitar.brand).distinct().all()
+        brand_list = [brand[0] for brand in brands]  # Extract values from tuples
+        return brand_list, 200
 
 api.add_resource(CheckSession, '/api/check_session')
 api.add_resource(Signup, '/api/signup')
@@ -194,6 +214,10 @@ api.add_resource(Guitars, '/api/guitars')
 api.add_resource(GuitarBySN, '/api/guitar/<string:serial_number>')
 api.add_resource(Models, '/api/models')
 api.add_resource(ModelByName, '/api/model/<string:model_name>')
+
+api.add_resource(Countries, '/api/countries')
+api.add_resource(SerialNumberLocations, '/api/serial-number-locations')
+api.add_resource(Brands, '/api/brands')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

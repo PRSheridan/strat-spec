@@ -197,3 +197,17 @@
 .spec-sheet-sub {
 
 }
+
+.guitar-block {
+  width: 350px;
+  height: 80px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.guitar-block form div {
+  display: flex;
+  flex-direction: column;
+}

@@ -1,29 +1,24 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {useForm, SubmitHandler} from "react-hook-form"
-import { UserGuitar } from "../../types";
+import GuitarBlock1 from "./guitarFormBlocks/GuitarBlock1";
+import GuitarBlock2 from "./guitarFormBlocks/GuitarBlock2";
 
-function GuitarForm () {
-    const navigate = useNavigate()
-    const [SN, setSN] = useState("")
+export default function GuitarForm() {
+  const navigate = useNavigate();
+  const [step, setStep] = useState(0);
+  const [formData, setFormData] = useState({}); // Store all form data
 
-    function handleSubmit(e: any) {
-      e.preventDefault()
-      navigate(`/specs/${SN}`)
-    }
+  // Function to save Block 1 data and move forward
+  const handleNext = (data: any) => {
+    setFormData((prev) => ({ ...prev, ...data })); // Merge previous data
+    setStep(step + 1); // Move to next step
+    console.log(data)
+  }
 
-    return (
-        <div id="search-form">
-        <form onSubmit={handleSubmit}>
-            <input 
-              type="text"
-              value={SN}
-              onChange={(e) => setSN(e.target.value)} />
-            <input type="submit" value="Search"/>
-        </form>
-        <p>Enter your Stratocaster's serial number above.</p>
-      </div>
-    )
+  return (
+    <div id="guitar-form">
+      {step === 0 && <GuitarBlock1 onNext={handleNext} />}
+      {step === 1 && <GuitarBlock2 onNext={handleNext} />}
+    </div>
+  )
 }
-
-export default GuitarForm

@@ -1,6 +1,11 @@
+import GuitarForm from "../components/forms/GuitarForm"
+
 function Feed () {
     return (
-        <>Feed of popular/new guitars.</>
+        <div className="guitar-form">
+            <div>Guitar Build</div>
+            <GuitarForm />
+        </div>
     )
 }
 
