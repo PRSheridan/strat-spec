@@ -27,7 +27,7 @@ export interface Model {
     country: string;
     description?: string;
     scale_length: number;
-    relic: 'None' | 'Light' | 'Medium' | 'Heavy' | 'Custom';
+    relic: string;
     other_controls?: any;
     hardware_finish: string[];
     pickup_configuration: string[];
@@ -62,23 +62,23 @@ export interface UserGuitar {
     serial_number: string;
     serial_number_location: string;
     year?: number;
-    country: string; //optional
+    country?: string; //optional
     description?: string;
     scale_length?: number;
     weight?: string;
-    relic: string; // N/A, light, medium, heavy
+    relic: string;
     other_controls?: string;
     hardware_finish?: string;
     pickup_configuration: string;
-    modified: boolean; //optional
+    modified?: boolean; //optional
     modifications?: string;
     created_at: string;
     updated_at: string;
     
-    pickups: GuitarPickup[]; //optional
+    pickups: GuitarPickup[];
     model?: Model | null;
     owner: User;
-    images: Image[]; //optional
+    images: Image[];
     
     body: Body;
     neck: Neck;
@@ -102,7 +102,7 @@ export interface GuitarPickup {
     brand?: string;
     model?: string;
     position: string[];
-    type: string; //Humbucker, Single-coil, P-90, Filtertron, Piezo
+    type: string;
     magnet?: string;
     active?: boolean; 
     noiseless?: boolean;
@@ -112,7 +112,7 @@ export interface GuitarPickup {
 export interface Body {
     id: number;
     wood?: string;
-    contour?: string; //N/A, 
+    contour?: string;
     routing?: string;
     chambering?: boolean;
     binding: boolean;
@@ -123,9 +123,9 @@ export interface Body {
 export interface Neck {
     id: number;
     wood?: string;
-    finish: 'Gloss' | 'Satin' | 'Natural';
+    finish: string;
     shape?: string;
-    truss_rod?: 'Modern' | 'Vintage';  //required
+    truss_rod: string;  //required
 }
 
 export interface Headstock {
@@ -137,7 +137,7 @@ export interface Headstock {
 
 export interface Fretboard {
     id: number;
-    material: string; //optional
+    material?: string; //optional
     radius?: string;
     fret_count: number;
     binding: boolean;
@@ -161,20 +161,20 @@ export interface Inlays {
     id: number;
     shape?: string;
     material?: string;
-    spacing?: string; //narrow wide
+    spacing?: string;
 }
 
 export interface Bridge {
     id: number;
     model?: string;
-    screws: number; //2 4 6
+    screws: number;
     spacing?: number;
     tremolo: boolean;
 }
 
 export interface Saddles {
     id: number;
-    style: string; //optional
+    style?: string; //optional
     material?: string;
 }
 
@@ -204,14 +204,14 @@ export interface StringTree {
 
 export interface NeckPlate {
     id: number;
-    style: 'Vintage' | 'Contour';
-    bolts: 3 | 4 | 5 | 6; //just 3 or 4
+    style: string;
+    bolts: number;
     details?: string;
 }
 
 export interface Pickguard {
     id: number;
-    ply_count?: 1 | 2 | 3 | 4 | 5;
+    ply_count?: number;
     screws: number;
     color: string;
 }

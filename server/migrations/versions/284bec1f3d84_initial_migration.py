@@ -1,8 +1,8 @@
-"""empty message
+"""initial migration
 
-Revision ID: 81c462c15153
+Revision ID: 284bec1f3d84
 Revises: 
-Create Date: 2025-03-14 13:50:34.371684
+Create Date: 2025-03-25 10:55:14.233294
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '81c462c15153'
+revision = '284bec1f3d84'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -45,7 +45,7 @@ def upgrade():
     )
     op.create_table('fretboard',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('material', sa.String(), nullable=False),
+    sa.Column('material', sa.String(), nullable=True),
     sa.Column('radius', sa.String(), nullable=True),
     sa.Column('fret_count', sa.Integer(), nullable=False),
     sa.Column('binding', sa.Boolean(), nullable=False),
@@ -98,7 +98,7 @@ def upgrade():
     sa.Column('wood', sa.String(), nullable=True),
     sa.Column('finish', sa.String(), nullable=False),
     sa.Column('shape', sa.String(), nullable=True),
-    sa.Column('truss_rod', sa.String(), nullable=True),
+    sa.Column('truss_rod', sa.String(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('neck_plate',
@@ -124,7 +124,7 @@ def upgrade():
     )
     op.create_table('saddles',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('style', sa.String(), nullable=False),
+    sa.Column('style', sa.String(), nullable=True),
     sa.Column('material', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
@@ -246,7 +246,7 @@ def upgrade():
     sa.Column('serial_number', sa.String(), nullable=False),
     sa.Column('serial_number_location', sa.String(), nullable=False),
     sa.Column('year', sa.Integer(), nullable=True),
-    sa.Column('country', sa.String(), nullable=False),
+    sa.Column('country', sa.String(), nullable=True),
     sa.Column('description', sa.String(), nullable=True),
     sa.Column('scale_length', sa.Float(), nullable=True),
     sa.Column('weight', sa.String(), nullable=True),

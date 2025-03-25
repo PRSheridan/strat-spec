@@ -118,7 +118,7 @@ def create_necks(num_necks=15):
 
     valid_finishes = ['Gloss', 'Satin', 'Natural']
 
-    valid_truss_rods = ['Modern', 'Vintage', None]
+    valid_truss_rods = ['Modern', 'Vintage']
 
     necks = []
     for _ in range(num_necks):

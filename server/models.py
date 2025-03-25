@@ -292,7 +292,7 @@ class UserGuitar(db.Model):
     serial_number = db.Column(db.String, nullable=False)
     serial_number_location = db.Column(db.String, nullable=False)
     year = db.Column(db.Integer, nullable=True)
-    country = db.Column(db.String, nullable=False)
+    country = db.Column(db.String, nullable=True)
     description = db.Column(db.String, nullable=True)
     scale_length = db.Column(db.Float, nullable=True)
     weight = db.Column(db.String, nullable=True)
@@ -300,7 +300,7 @@ class UserGuitar(db.Model):
     other_controls = db.Column(db.String, nullable=True)
     hardware_finish = db.Column(db.String, nullable=True)
     pickup_configuration = db.Column(db.String, nullable=False)
-    modified = db.Column(db.Boolean, default=False)
+    modified = db.Column(db.Boolean, default=True)
     modifications = db.Column(db.String, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -501,7 +501,7 @@ class Neck(db.Model):
     wood = db.Column(db.String, nullable=True)
     finish = db.Column(db.String, nullable=False)
     shape = db.Column(db.String, nullable=True)
-    truss_rod = db.Column(db.String, nullable=True)
+    truss_rod = db.Column(db.String, nullable=False)
 
     # Relationships
     models = db.relationship('Model', back_populates='neck')
@@ -556,7 +556,7 @@ class Fretboard(db.Model):
     __tablename__ = 'fretboard'
 
     id = db.Column(db.Integer, primary_key=True)
-    material = db.Column(db.String, nullable=False)
+    material = db.Column(db.String, nullable=True)
     radius = db.Column(db.String, nullable=True)
     fret_count = db.Column(db.Integer, nullable=False)
     binding = db.Column(db.Boolean, nullable=False)
@@ -717,7 +717,7 @@ class Saddles(db.Model):
     __tablename__ = 'saddles'
 
     id = db.Column(db.Integer, primary_key=True)
-    style = db.Column(db.String, nullable=False)
+    style = db.Column(db.String, nullable=True)
     material = db.Column(db.String, nullable=True)
 
     # Relationships
