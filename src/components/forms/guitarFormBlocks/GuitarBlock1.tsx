@@ -2,15 +2,13 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { Model } from "../../../types"
 
-// Validation Schema
 const block1Schema = z.object({
   serial_number: z.string().min(3, "Serial number is required"),
   brand: z.string().min(1, "Brand is required"),
-  model: z.string().nullable(), // Model can be selected or left empty
+  model: z.string().nullable().optional(),
   serial_number_location: z.string().min(1, "Serial number location is required"),
-  year: z.number().min(1930, "Year must be at least 1930").max(new Date().getFullYear(), "Year cannot be in the future").optional(),
+  year: z.number().min(1930, "Year must be at least 1930").max(new Date().getFullYear(), "Year cannot be in the future").nullable().optional(),
   country: z.string().min(1, "Country is required"),
 })
 
@@ -45,7 +43,7 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
     },
   })
 
-  const onSubmit = (data: Block1Data) => {
+  function onSubmit(data: Block1Data) {
     console.log("Block 1 Data:", data)
     onNext(data)
   }
@@ -76,6 +74,7 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
           <label>Model (Optional)</label>
           <select {...register("model")}>
             <option value="">Select a Model</option>
+            <option value="">Unknown / Not listed</option>
             {modelOptions.map((model) => (
               <option key={model.id} value={model.id}>{model.name}</option> //---------------------------------------------------------
             ))}

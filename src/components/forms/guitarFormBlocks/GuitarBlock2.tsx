@@ -1,16 +1,14 @@
-import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 
-// Validation Schema
 const block2Schema = z
   .object({
     name: z.string().min(3, "Guitar name must be at least 3 characters"),
-    modified: z.boolean(),
-    modifications: z.string().optional(),
-    description: z.string().optional(),
-    images: z.array(z.instanceof(File)).optional(),
+    modified: z.boolean().nullable().optional(),
+    modifications: z.string().nullable().optional(),
+    description: z.string().nullable().optional(),
+    images: z.array(z.instanceof(File)).nullable().optional(),
   })
   .refine((data) => {
     // If modified is true, modifications must not be empty
@@ -42,9 +40,7 @@ function GuitarBlock2({ onNext }: GuitarBlock2Props) {
     },
   })
 
-  const modified = watch("modified")
-
-  const onSubmit = (data: Block2Data) => {
+  function onSubmit(data:Block2Data) {
     console.log("Block 2 Data:", data)
     onNext(data)
   }
@@ -65,7 +61,7 @@ function GuitarBlock2({ onNext }: GuitarBlock2Props) {
           <input type="checkbox" {...register("modified")} />
         </div>
 
-        {modified && (
+        {watch("modified") && (
           <div>
             <label>Modifications</label>
             <input {...register("modifications")} placeholder="Describe modifications" />
