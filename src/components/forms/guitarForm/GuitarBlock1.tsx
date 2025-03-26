@@ -6,10 +6,12 @@ import { z } from "zod"
 const block1Schema = z.object({
   serial_number: z.string().min(3, "Serial number is required"),
   brand: z.string().min(1, "Brand is required"),
+  custom_brand: z.string().min(1, "Custom brand is required"),
   model: z.string().nullable().optional(),
   serial_number_location: z.string().min(1, "Serial number location is required"),
   year: z.number().min(1930, "Year must be at least 1930").max(new Date().getFullYear(), "Year cannot be in the future").nullable().optional(),
   country: z.string().min(1, "Country is required"),
+  custom_country: z.string().min(1, "Entry required if not already listed"),
 })
 
 type Block1Data = z.infer<typeof block1Schema>
@@ -31,19 +33,22 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
     fetch("/api/countries").then(res => res.json()).then(setCountryOptions)
   }, [])
 
-  const { register, handleSubmit, formState: { errors } } = useForm<Block1Data>({
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<Block1Data>({
     resolver: zodResolver(block1Schema),
     defaultValues: {
       serial_number: "",
       brand: "",
+      custom_brand: "",
       model: null,
       serial_number_location: "",
       year: undefined,
       country: "",
+      custom_country: "",
     },
   })
 
   function onSubmit(data: Block1Data) {
+    if (data.brand == "not_listed" ) { data.brand = data.custom_brand }
     console.log("Block 1 Data:", data)
     onNext(data)
   }
@@ -53,24 +58,40 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
       <form onSubmit={handleSubmit(onSubmit)}>
         <h2>Block 1: Identification</h2>
 
-        <div>
+        <div className="guitar-block-section">
           <label>Serial Number</label>
           <input {...register("serial_number")} placeholder="Enter serial number" />
           {errors.serial_number && <p>{errors.serial_number.message}</p>}
         </div>
 
-        <div>
+        <div className="guitar-block-section">
           <label>Brand</label>
           <select {...register("brand")}>
             <option value="">Select a Brand</option>
+            <option value="">Unknown</option>
+            <option value="not_listed">Not listed</option>
             {brandOptions.map((brand) => (
               <option key={brand} value={brand}>{brand}</option>
             ))}
           </select>
+
+          {watch("brand") === "not_listed" && (
+            <input
+              type="text"
+              {...register("custom_brand", {
+                required: true,
+                validate: val =>
+                  /^[A-Z][a-z]+(?: [A-Z][a-z]+)*$/.test(val) ||
+                  "Use proper spelling and casing (e.g. Fender)"
+              })}
+              placeholder="Enter your value">
+            </input>
+          )}
           {errors.brand && <p>{errors.brand.message}</p>}
+          {errors.custom_brand && <p>{errors.custom_brand.message}</p>}
         </div>
 
-        <div>
+        <div className="guitar-block-section">
           <label>Model (Optional)</label>
           <select {...register("model")}>
             <option value="">Select a Model</option>
@@ -81,7 +102,7 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
           </select>
         </div>
 
-        <div>
+        <div className="guitar-block-section">
           <label>Serial Number Location</label>
           <select {...register("serial_number_location")}>
             <option value="">Select Location</option>
@@ -92,21 +113,36 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
           {errors.serial_number_location && <p>{errors.serial_number_location.message}</p>}
         </div>
 
-        <div>
+        <div className="guitar-block-section">
           <label>Year</label>
           <input type="number" {...register("year", { valueAsNumber: true })} placeholder="Enter year" />
           {errors.year && <p>{errors.year.message}</p>}
         </div>
 
-        <div>
+        <div className="guitar-block-section">
           <label>Country</label>
           <select {...register("country")}>
             <option value="">Select a Country</option>
+            <option value="not_listed">Not listed</option>
             {countryOptions.map((country) => (
               <option key={country} value={country}>{country}</option>
             ))}
           </select>
+
+          {watch("country") === "not_listed" && (
+            <input
+              type="text"
+              {...register("custom_country", {
+                required: true,
+                validate: val =>
+                  /^[A-Z][a-z]+(?: [A-Z][a-z]+)*$/.test(val) ||
+                  "Use proper spelling and casing (e.g. Japan)"
+              })}
+              placeholder="Enter your value">
+            </input>
+          )}
           {errors.country && <p>{errors.country.message}</p>}
+          {errors.custom_country && <p>{errors.custom_country.message}</p>}
         </div>
 
         <button type="submit">Next</button>

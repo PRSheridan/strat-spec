@@ -1,4 +1,4 @@
-import GuitarForm from "../components/forms/GuitarForm"
+import GuitarForm from "../components/forms/guitarForm/GuitarForm"
 
 function Feed () {
     return (

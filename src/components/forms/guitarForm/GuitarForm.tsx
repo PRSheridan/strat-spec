@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import GuitarBlock1 from "./guitarFormBlocks/GuitarBlock1";
-import GuitarBlock2 from "./guitarFormBlocks/GuitarBlock2";
-import GuitarBlock3 from "./guitarFormBlocks/GuitarBlock3";
+import GuitarBlockInfo from "./GuitarBlockInfo";
+import GuitarBlock1 from "./GuitarBlock1";
+import GuitarBlock2 from "./GuitarBlock2";
+import GuitarBlock3 from "./GuitarBlock3";
+import "./guitarForm.css"
 
 export default function GuitarForm() {
   const navigate = useNavigate()
@@ -18,9 +20,10 @@ export default function GuitarForm() {
 
   return (
     <div id="guitar-form">
-      {step === 0 && <GuitarBlock1 onNext={handleNext} />}
-      {step === 1 && <GuitarBlock2 onNext={handleNext} />}
-      {step === 2 && <GuitarBlock3 onNext={handleNext} />}
+      {step === 0 && <GuitarBlockInfo onNext={handleNext} />}
+      {step === 1 && <GuitarBlock1 onNext={handleNext} />}
+      {step === 2 && <GuitarBlock2 onNext={handleNext} />}
+      {step === 3 && <GuitarBlock3 onNext={handleNext} />}
     </div>
   )
 }

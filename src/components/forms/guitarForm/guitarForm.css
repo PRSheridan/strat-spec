@@ -1,0 +1,75 @@
+.guitar-block {
+  width: 400px;
+  margin: 30px auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  background-color: #e1e1e1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.guitar-block h2 {
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: 24px;
+  color: #333;
+}
+
+.guitar-block form div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.guitar-block-section {
+  margin: 8px 0;
+}
+
+.guitar-block-section label {
+  font-size: 20px;
+  font-weight: 500;
+  color: #444;
+}
+
+.guitar-block-section input,
+.guitar-block-section select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.guitar-block-section input:focus,
+.guitar-block-section select:focus {
+  border-color: #2B5F8C;
+  box-shadow: 0 0 4px rgba(0, 119, 255, 0.3);
+  outline: none;
+}
+
+.guitar-block button {
+  align-self: center;
+  margin-top: 12px;
+  font-size: 16px;
+  padding: 10px 30px;
+  background-color: #2B5F8C;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.guitar-block button:hover {
+  background-color: #a5c6df;
+}
+
+.guitar-block p {
+  color: #c00;
+  font-size: 13px;
+  margin: 2px 0 0;
+}
+
