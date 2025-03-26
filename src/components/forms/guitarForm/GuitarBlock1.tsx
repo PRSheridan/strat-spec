@@ -6,7 +6,7 @@ import { z } from "zod"
 const block1Schema = z.object({
   serial_number: z.string().min(3, "Serial number is required"),
   brand: z.string().min(1, "Brand is required"),
-  custom_brand: z.string().min(1, "Custom brand is required"),
+  custom_brand: z.string().min(1, "Entry required if not already listed"),
   model: z.string().nullable().optional(),
   serial_number_location: z.string().min(1, "Serial number location is required"),
   year: z.number().min(1930, "Year must be at least 1930").max(new Date().getFullYear(), "Year cannot be in the future").nullable().optional(),
@@ -59,13 +59,13 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
         <h2>Block 1: Identification</h2>
 
         <div className="guitar-block-section">
-          <label>Serial Number</label>
+          <label>Serial Number*</label>
           <input {...register("serial_number")} placeholder="Enter serial number" />
           {errors.serial_number && <p>{errors.serial_number.message}</p>}
         </div>
 
         <div className="guitar-block-section">
-          <label>Brand</label>
+          <label>Brand*</label>
           <select {...register("brand")}>
             <option value="">Select a Brand</option>
             <option value="">Unknown</option>
@@ -74,25 +74,27 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
               <option key={brand} value={brand}>{brand}</option>
             ))}
           </select>
+          {errors.brand && <p>{errors.brand.message}</p>}
 
           {watch("brand") === "not_listed" && (
-            <input
-              type="text"
-              {...register("custom_brand", {
-                required: true,
-                validate: val =>
-                  /^[A-Z][a-z]+(?: [A-Z][a-z]+)*$/.test(val) ||
-                  "Use proper spelling and casing (e.g. Fender)"
-              })}
-              placeholder="Enter your value">
-            </input>
+            <>
+              <input
+                type="text"
+                {...register("custom_brand", {
+                  required: true,
+                  validate: val =>
+                    /^[A-Z][a-z]+(?: [A-Z][a-z]+)*$/.test(val) ||
+                    "Use proper spelling and casing (e.g. Fender)"
+                })}
+                placeholder="Enter your value">
+              </input>
+              {errors.custom_brand && <p>{errors.custom_brand.message}</p>}
+            </>
           )}
-          {errors.brand && <p>{errors.brand.message}</p>}
-          {errors.custom_brand && <p>{errors.custom_brand.message}</p>}
         </div>
 
         <div className="guitar-block-section">
-          <label>Model (Optional)</label>
+          <label>Model</label>
           <select {...register("model")}>
             <option value="">Select a Model</option>
             <option value="">Unknown / Not listed</option>
@@ -103,7 +105,7 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
         </div>
 
         <div className="guitar-block-section">
-          <label>Serial Number Location</label>
+          <label>Serial Number Location*</label>
           <select {...register("serial_number_location")}>
             <option value="">Select Location</option>
             {locationOptions.map((location) => (
@@ -120,7 +122,7 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
         </div>
 
         <div className="guitar-block-section">
-          <label>Country</label>
+          <label>Country*</label>
           <select {...register("country")}>
             <option value="">Select a Country</option>
             <option value="not_listed">Not listed</option>
@@ -128,21 +130,23 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
               <option key={country} value={country}>{country}</option>
             ))}
           </select>
+          {errors.country && <p>{errors.country.message}</p>}
 
           {watch("country") === "not_listed" && (
-            <input
-              type="text"
-              {...register("custom_country", {
-                required: true,
-                validate: val =>
-                  /^[A-Z][a-z]+(?: [A-Z][a-z]+)*$/.test(val) ||
-                  "Use proper spelling and casing (e.g. Japan)"
-              })}
-              placeholder="Enter your value">
-            </input>
+            <>
+              <input
+                type="text"
+                {...register("custom_country", {
+                  required: true,
+                  validate: val =>
+                    /^[A-Z][a-z]+(?: [A-Z][a-z]+)*$/.test(val) ||
+                    "Use proper spelling and casing (e.g. Japan)"
+                })}
+                placeholder="Enter your value">
+              </input>
+              {errors.custom_country && <p>{errors.custom_country.message}</p>}
+            </>
           )}
-          {errors.country && <p>{errors.country.message}</p>}
-          {errors.custom_country && <p>{errors.custom_country.message}</p>}
         </div>
 
         <button type="submit">Next</button>

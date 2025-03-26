@@ -5,7 +5,7 @@
   border: 1px solid #ddd;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  background-color: #e1e1e1;
+  background-color: #ddd;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -38,7 +38,7 @@
 .guitar-block-section select {
   padding: 8px;
   border: 1px solid #ccc;
-  border-radius: 6px;
+  border-radius: 7px;
   font-size: 14px;
   transition: border 0.2s, box-shadow 0.2s;
 }
@@ -68,7 +68,7 @@
 }
 
 .guitar-block p {
-  color: #c00;
+  color: #F75249;
   font-size: 13px;
   margin: 2px 0 0;
 }
