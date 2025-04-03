@@ -6,12 +6,12 @@ import { z } from "zod"
 const block1Schema = z.object({
   serial_number: z.string().min(3, "Serial number is required"),
   brand: z.string().min(1, "Brand is required"),
-  custom_brand: z.string().min(1, "Entry required if not already listed"),
+  custom_brand: z.string().optional(),
   model: z.string().nullable().optional(),
   serial_number_location: z.string().min(1, "Serial number location is required"),
-  year: z.number().min(1930, "Year must be at least 1930").max(new Date().getFullYear(), "Year cannot be in the future").nullable().optional(),
+  year: z.number().min(1930).max(new Date().getFullYear()).nullable().optional(),
   country: z.string().min(1, "Country is required"),
-  custom_country: z.string().min(1, "Entry required if not already listed"),
+  custom_country: z.string().optional(),
 })
 
 type Block1Data = z.infer<typeof block1Schema>
@@ -27,6 +27,7 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
   const [countryOptions, setCountryOptions] = useState<string[]>([])
 
   useEffect(() => {
+    console.log("Errors:", errors)
     fetch("/api/brands").then(res => res.json()).then(setBrandOptions)
     fetch("/api/models").then(res => res.json()).then(models => setModelOptions(models.map((model: any) => ({id: model.id, name: model.model_name}))))
     fetch("/api/serial-number-locations").then(res => res.json()).then(setLocationOptions)
@@ -35,6 +36,7 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm<Block1Data>({
     resolver: zodResolver(block1Schema),
+    mode: "onSubmit",
     defaultValues: {
       serial_number: "",
       brand: "",
@@ -48,10 +50,23 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
   })
 
   function onSubmit(data: Block1Data) {
-    if (data.brand == "not_listed" ) { data.brand = data.custom_brand }
+    const { brand, country, custom_brand, custom_country } = data
+  
+    if (brand === "not_listed" && custom_brand) {
+      data.brand = custom_brand
+    }
+  
+    if (country === "not_listed" && custom_country) {
+      data.country = custom_country
+    }
+  
+    if (data.custom_brand === "(ignore)") delete data.custom_brand
+    if (data.custom_country === "(ignore)") delete data.custom_country
+  
     console.log("Block 1 Data:", data)
     onNext(data)
   }
+  
 
   return (
     <div className="guitar-block">
@@ -81,13 +96,14 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
               <input
                 type="text"
                 {...register("custom_brand", {
-                  required: true,
-                  validate: val =>
-                    /^[A-Z][a-z]+(?: [A-Z][a-z]+)*$/.test(val) ||
-                    "Use proper spelling and casing (e.g. Fender)"
+                  required: "Entry required if not already listed",
+                  validate: (val: string | undefined) =>
+                    typeof val === "string" && /^[A-Z][a-z]+(?: [A-Z][a-z]+)*$/.test(val)
+                      ? true
+                      : "Use proper spelling and casing (e.g. Fender)",
                 })}
-                placeholder="Enter your value">
-              </input>
+                placeholder="Enter your value"
+              />
               {errors.custom_brand && <p>{errors.custom_brand.message}</p>}
             </>
           )}
@@ -137,13 +153,14 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
               <input
                 type="text"
                 {...register("custom_country", {
-                  required: true,
-                  validate: val =>
-                    /^[A-Z][a-z]+(?: [A-Z][a-z]+)*$/.test(val) ||
-                    "Use proper spelling and casing (e.g. Japan)"
+                  required: "Entry required if not already listed",
+                  validate: (val: string | undefined) =>
+                    typeof val === "string" && /^[A-Z][a-z]+(?: [A-Z][a-z]+)*$/.test(val)
+                      ? true
+                      : "Use proper spelling and casing (e.g. Japan)",                  
                 })}
-                placeholder="Enter your value">
-              </input>
+                placeholder="Enter your value"
+              />
               {errors.custom_country && <p>{errors.custom_country.message}</p>}
             </>
           )}
