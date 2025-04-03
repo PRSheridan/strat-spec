@@ -36,7 +36,6 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm<Block1Data>({
     resolver: zodResolver(block1Schema),
-    mode: "onSubmit",
     defaultValues: {
       serial_number: "",
       brand: "",
@@ -49,7 +48,7 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
     },
   })
 
-  function onSubmit(data: Block1Data) {
+  function handleNext(data: Block1Data) {
     const { brand, country, custom_brand, custom_country } = data
   
     if (brand === "not_listed" && custom_brand) {
@@ -70,7 +69,7 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
 
   return (
     <div className="guitar-block">
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(handleNext)}>
         <h2>Block 1: Identification</h2>
 
         <div className="guitar-block-section">

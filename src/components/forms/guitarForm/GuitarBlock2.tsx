@@ -11,7 +11,6 @@ const block2Schema = z
     images: z.array(z.instanceof(File)).nullable().optional(),
   })
   .refine((data) => {
-    // If modified is true, modifications must not be empty
     if (data.modified && (!data.modifications || data.modifications.trim().length === 0)) {
       return false
     }
@@ -20,7 +19,6 @@ const block2Schema = z
     message: "Please describe the modifications",
     path: ["modifications"],
   })
-
 
 type Block2Data = z.infer<typeof block2Schema>
 
@@ -40,7 +38,7 @@ function GuitarBlock2({ onNext }: GuitarBlock2Props) {
     },
   })
 
-  function onSubmit(data:Block2Data) {
+  function onSubmit(data: Block2Data) {
     console.log("Block 2 Data:", data)
     onNext(data)
   }
@@ -50,35 +48,44 @@ function GuitarBlock2({ onNext }: GuitarBlock2Props) {
       <form onSubmit={handleSubmit(onSubmit)}>
         <h2>Block 2: Personalization</h2>
 
-        <div>
+        <div className="guitar-block-section">
           <label>Guitar Name</label>
           <input {...register("name")} placeholder="Enter guitar name" />
           {errors.name && <p>{errors.name.message}</p>}
         </div>
 
-        <div>
+        <div className="guitar-block-section inline">
           <label>Modified?</label>
-          <input type="checkbox" {...register("modified")} />
+          <label className="guitar-switch">
+            <input type="checkbox" {...register("modified")} />
+            <span className="guitar-slider" />
+          </label>
         </div>
 
+
+
         {watch("modified") && (
-          <div>
+          <div className="guitar-block-section">
             <label>Modifications</label>
-            <input {...register("modifications")} placeholder="Describe modifications" />
+            <textarea {...register("modifications")} placeholder="Describe modifications" />
             {errors.modifications && <p>{errors.modifications.message}</p>}
           </div>
         )}
 
-        <div>
+        <div className="guitar-block-section">
           <label>Description (Optional)</label>
           <textarea {...register("description")} placeholder="Enter guitar description" />
         </div>
 
-        <div>
+        <div className="guitar-block-section">
           <label>Upload Images</label>
-          <input type="file" multiple onChange={(e) => {
-            setValue("images", Array.from(e.target.files || []))
-          }} />
+          <input
+            type="file"
+            multiple
+            onChange={(e) => {
+              setValue("images", Array.from(e.target.files || []))
+            }}
+          />
         </div>
 
         <button type="submit">Next</button>
@@ -88,3 +95,4 @@ function GuitarBlock2({ onNext }: GuitarBlock2Props) {
 }
 
 export default GuitarBlock2
+

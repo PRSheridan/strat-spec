@@ -8,7 +8,7 @@ function GuitarBlockInfo({ onNext }: any) {
         <label>Page with information about adding a guitar to your profile.</label>
         <p>* indicates a field is required</p>
       </div>
-      <button onClick={onNext}>Next</button>
+      <button onClick={() => onNext({})}>Next</button>
     </div>
   )
 }

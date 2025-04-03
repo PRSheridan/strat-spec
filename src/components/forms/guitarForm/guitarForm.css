@@ -1,4 +1,5 @@
 .guitar-block {
+  text-align: left;
   width: 400px;
   margin: 30px auto;
   padding: 20px;
@@ -6,16 +7,21 @@
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   background-color: #ddd;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: block; /* changed from flex to avoid layout influencing headings */
 }
 
 .guitar-block h2 {
+  margin-left: 20px;
   margin-bottom: 10px;
-  text-align: center;
+  text-align: left;
   font-size: 24px;
   color: #333;
+}
+
+.guitar-block form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .guitar-block form div {
@@ -29,13 +35,15 @@
 }
 
 .guitar-block-section label {
+  margin-left: 10px;
   font-size: 20px;
   font-weight: 500;
   color: #444;
 }
 
 .guitar-block-section input,
-.guitar-block-section select {
+.guitar-block-section select,
+.guitar-block-section textarea {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 7px;
@@ -44,10 +52,15 @@
 }
 
 .guitar-block-section input:focus,
-.guitar-block-section select:focus {
+.guitar-block-section select:focus,
+.guitar-block-section textarea:focus {
   border-color: #2B5F8C;
   box-shadow: 0 0 4px rgba(0, 119, 255, 0.3);
   outline: none;
+}
+
+.guitar-block-section textarea {
+  resize: vertical;
 }
 
 .guitar-block button {
@@ -73,3 +86,58 @@
   margin: 2px 0 0;
 }
 
+/* Inline section (e.g. checkbox or switch next to label) */
+.guitar-block-section.inline {
+  
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Switch styles */
+.guitar-switch {
+  margin-left: 10px;
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 24px;
+}
+
+.guitar-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.guitar-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  border-radius: 24px;
+  transition: background-color 0.3s;
+}
+
+.guitar-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+.guitar-switch input:checked + .guitar-slider {
+  background-color: #2B5F8C;
+}
+
+.guitar-switch input:checked + .guitar-slider:before {
+  transform: translateX(22px);
+}

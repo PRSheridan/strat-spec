@@ -11,11 +11,10 @@ export default function GuitarForm() {
   const [step, setStep] = useState(0)
   const [formData, setFormData] = useState({})
 
-  // When onNext is called on each form block, data is merged and step is increased
   function handleNext(data: any) {
     setFormData((prev) => ({ ...prev, ...data }))
-    setStep(step + 1)
-    console.log(formData)
+    setStep((prev) => prev + 1)
+    console.log("Current Form Data", formData)
   }
 
   return (
