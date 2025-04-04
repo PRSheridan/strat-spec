@@ -9,20 +9,11 @@ function Specs() {
     const { item, setItem } = useItem()
     const { modelName, serialNumber } = useParams()
 
-    useEffect(() => {
-        //details on page load (always trigger)
-        console.log("Effect triggered")
-        console.log("Current item:", item)
-        console.log("Params - Model:", modelName, "Serial:", serialNumber)
-    
+    useEffect(() => {  
         if (!item || isMismatch(item)) {
             const apiPath = serialNumber
                 ? `/api/guitar/${serialNumber}`
                 : `/api/model/${modelName}`
-            
-            //Retrieve guitar data (only trigger on refresh)
-            console.log("Fetching from API:", apiPath)
-
             fetch(apiPath)
                 .then(response => response.json())
                 .then((data: Model | UserGuitar) => {

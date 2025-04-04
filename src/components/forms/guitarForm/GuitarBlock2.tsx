@@ -50,6 +50,7 @@ function GuitarBlock2({ onNext }: GuitarBlock2Props) {
 
         <div className="guitar-block-section">
           <label>Guitar Name</label>
+          <div>year country Brand Stratocaster (modified)</div>
           <input {...register("name")} placeholder="Enter guitar name" />
           {errors.name && <p>{errors.name.message}</p>}
         </div>
@@ -61,8 +62,6 @@ function GuitarBlock2({ onNext }: GuitarBlock2Props) {
             <span className="guitar-slider" />
           </label>
         </div>
-
-
 
         {watch("modified") && (
           <div className="guitar-block-section">

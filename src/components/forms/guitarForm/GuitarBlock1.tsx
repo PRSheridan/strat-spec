@@ -3,16 +3,39 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 
-const block1Schema = z.object({
-  serial_number: z.string().min(3, "Serial number is required"),
-  brand: z.string().min(1, "Brand is required"),
-  custom_brand: z.string().optional(),
-  model: z.string().nullable().optional(),
-  serial_number_location: z.string().min(1, "Serial number location is required"),
-  year: z.number().min(1930).max(new Date().getFullYear()).nullable().optional(),
-  country: z.string().min(1, "Country is required"),
-  custom_country: z.string().optional(),
-})
+const block1Schema = z
+  .object({
+    serial_number: z.string().min(3, "Serial number is required"),
+    brand: z.string().min(1, "Brand is required"),
+    custom_brand: z.string().optional(),
+    model: z.string().nullable().optional(),
+    serial_number_location: z.string().min(1, "Serial number location is required"),
+    year: z
+      .number()
+      .min(1930, "Year must be at least 1930")
+      .max(new Date().getFullYear(), "Year cannot be in the future")
+      .nullable()
+      .optional(),
+    country: z.string().min(1, "Country is required"),
+    custom_country: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.brand === "not_listed" && !data.custom_brand?.trim()) {
+      ctx.addIssue({
+        path: ["custom_brand"],
+        code: z.ZodIssueCode.custom,
+        message: "Entry required if not already listed",
+      })
+    }
+
+    if (data.country === "not_listed" && !data.custom_country?.trim()) {
+      ctx.addIssue({
+        path: ["custom_country"],
+        code: z.ZodIssueCode.custom,
+        message: "Entry required if not already listed",
+      })
+    }
+  })
 
 type Block1Data = z.infer<typeof block1Schema>
 
@@ -93,14 +116,7 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
           {watch("brand") === "not_listed" && (
             <>
               <input
-                type="text"
-                {...register("custom_brand", {
-                  required: "Entry required if not already listed",
-                  validate: (val: string | undefined) =>
-                    typeof val === "string" && /^[A-Z][a-z]+(?: [A-Z][a-z]+)*$/.test(val)
-                      ? true
-                      : "Use proper spelling and casing (e.g. Fender)",
-                })}
+                {...register("custom_brand")}
                 placeholder="Enter your value"
               />
               {errors.custom_brand && <p>{errors.custom_brand.message}</p>}
@@ -150,14 +166,7 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
           {watch("country") === "not_listed" && (
             <>
               <input
-                type="text"
-                {...register("custom_country", {
-                  required: "Entry required if not already listed",
-                  validate: (val: string | undefined) =>
-                    typeof val === "string" && /^[A-Z][a-z]+(?: [A-Z][a-z]+)*$/.test(val)
-                      ? true
-                      : "Use proper spelling and casing (e.g. Japan)",                  
-                })}
+                {...register("custom_country")}
                 placeholder="Enter your value"
               />
               {errors.custom_country && <p>{errors.custom_country.message}</p>}

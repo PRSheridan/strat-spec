@@ -32,7 +32,7 @@ function GuitarCard({ item, viewMode }: GuitarCardProps) {
             <div className="item-name">
                 {isUserGuitar ? item.name : item.model_name}
             </div>
-
+  
             <div className="item-details">
                 {viewMode === 'detailed' ? (
                     isUserGuitar ? (

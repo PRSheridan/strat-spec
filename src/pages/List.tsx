@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import GuitarCard from '../components/GuitarCard';
 import { Model, UserGuitar } from '../types';
-import GuitarForm from '../components/forms/guitarForm/GuitarForm';
 
 interface ListProps {
     type: 'models' | 'guitars';
