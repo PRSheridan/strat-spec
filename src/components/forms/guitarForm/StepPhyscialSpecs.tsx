@@ -1,13 +1,13 @@
-import { useState } from 'react'
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 
-const block3Schema = z
+const physicalSpecsSchema = z
   .object({
     scale_length: z.number().min(24).max(27).nullable().optional(),
     weight: z.string().optional(),
-    relic: z.enum(['None', 'Light', 'Medium', 'Heavy', 'Custom']),
+    relic: z.enum(["None", "Light", "Medium", "Heavy", "Custom"]),
     show_other_controls: z.boolean().optional(),
     other_controls: z.string().nullable().optional(),
     hardware_finish: z.string().nullable().optional(),
@@ -31,17 +31,15 @@ const block3Schema = z
     }
   })
 
+type PhysicalSpecsData = z.infer<typeof physicalSpecsSchema>
 
-
-type Block3Data = z.infer<typeof block3Schema>
-
-interface GuitarBlock3Props {
-  onNext: (data: Block3Data) => void
+interface StepPhysicalSpecsProps {
+  onNext: (data: PhysicalSpecsData) => void
 }
 
-function GuitarBlock3({ onNext }: GuitarBlock3Props) {
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<Block3Data>({
-    resolver: zodResolver(block3Schema),
+function StepPhysicalSpecs({ onNext }: StepPhysicalSpecsProps) {
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<PhysicalSpecsData>({
+    resolver: zodResolver(physicalSpecsSchema),
     defaultValues: {
       scale_length: undefined,
       weight: undefined,
@@ -55,26 +53,27 @@ function GuitarBlock3({ onNext }: GuitarBlock3Props) {
 
   const [pounds, setPounds] = useState(7)
   const [ounces, setOunces] = useState(0)
-  
+
   const showOtherControls = watch("show_other_controls")
 
-  function onSubmit(data: Block3Data) {
+  function onSubmit(data: PhysicalSpecsData) {
     const combinedWeight = `${pounds} lbs ${ounces} oz`
     const finalData = { ...data, weight: combinedWeight }
-  
-    console.log("Block 3 Data:", finalData)
+
+    console.log("Step 2 Data:", finalData)
     onNext(finalData)
   }
 
   return (
     <div className="guitar-block">
       <form onSubmit={handleSubmit(onSubmit)}>
-        <h2>Block 3: Specs & Configuration</h2>
+        <h2>Step 2: Physical Specs</h2>
 
         <div className="guitar-block-section">
           <label>Scale Length</label>
           <input
             type="number"
+            step="any"
             {...register("scale_length", { valueAsNumber: true })}
             placeholder="Enter a scale length (24–27 inches)"
           />
@@ -131,11 +130,11 @@ function GuitarBlock3({ onNext }: GuitarBlock3Props) {
         <div className="guitar-block-section">
           <label>Hardware Finish</label>
           <select {...register("hardware_finish")}>
-            <option value="Chrome">HH</option>
-            <option value="Nickel">SS</option>
-            <option value="Gold">Other</option>
-            <option value="Black">Other</option>
-            <option value="Other">HH</option>
+            <option value="Chrome">Chrome</option>
+            <option value="Nickel">Nickel</option>
+            <option value="Gold">Gold</option>
+            <option value="Black">Black</option>
+            <option value="Other">Other</option>
           </select>
         </div>
 
@@ -157,4 +156,5 @@ function GuitarBlock3({ onNext }: GuitarBlock3Props) {
   )
 }
 
-export default GuitarBlock3
+export default StepPhysicalSpecs
+

@@ -1,6 +1,4 @@
-
-
-function GuitarBlockInfo({ onNext }: any) {
+function StepInformation({ onNext }: any) {
   return (
     <div className="guitar-block">
       <h2>Guitar Build Information</h2>
@@ -13,4 +11,4 @@ function GuitarBlockInfo({ onNext }: any) {
   )
 }
 
-export default GuitarBlockInfo
+export default StepInformation

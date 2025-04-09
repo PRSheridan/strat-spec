@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 
-const block2Schema = z
+const personalizationSchema = z
   .object({
     name: z.string().min(3, "Guitar name must be at least 3 characters"),
     modified: z.boolean().nullable().optional(),
@@ -20,15 +20,15 @@ const block2Schema = z
     path: ["modifications"],
   })
 
-type Block2Data = z.infer<typeof block2Schema>
+type PersonalizationData = z.infer<typeof personalizationSchema>
 
-interface GuitarBlock2Props {
-  onNext: (data: Block2Data) => void
+interface StepPersonalizationProps {
+  onNext: (data: PersonalizationData) => void
 }
 
-function GuitarBlock2({ onNext }: GuitarBlock2Props) {
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<Block2Data>({
-    resolver: zodResolver(block2Schema),
+function StepPersonalization({ onNext }: StepPersonalizationProps) {
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<PersonalizationData>({
+    resolver: zodResolver(personalizationSchema),
     defaultValues: {
       name: "",
       modified: false,
@@ -38,15 +38,15 @@ function GuitarBlock2({ onNext }: GuitarBlock2Props) {
     },
   })
 
-  function onSubmit(data: Block2Data) {
-    console.log("Block 2 Data:", data)
+  function onSubmit(data: PersonalizationData) {
+    console.log("Step 6 Data:", data)
     onNext(data)
   }
 
   return (
     <div className="guitar-block">
       <form onSubmit={handleSubmit(onSubmit)}>
-        <h2>Block 2: Personalization</h2>
+        <h2>Step 6: Personalization</h2>
 
         <div className="guitar-block-section">
           <label>Guitar Name</label>
@@ -93,5 +93,6 @@ function GuitarBlock2({ onNext }: GuitarBlock2Props) {
   )
 }
 
-export default GuitarBlock2
+export default StepPersonalization
+
 

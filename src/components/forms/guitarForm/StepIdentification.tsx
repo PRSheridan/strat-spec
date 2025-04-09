@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 
-const block1Schema = z
+const identificationSchema = z
   .object({
     serial_number: z.string().min(3, "Serial number is required"),
     brand: z.string().min(1, "Brand is required"),
@@ -37,13 +37,13 @@ const block1Schema = z
     }
   })
 
-type Block1Data = z.infer<typeof block1Schema>
+type IdentificationData = z.infer<typeof identificationSchema>
 
-interface GuitarBlock1Props {
-  onNext: (data: Block1Data) => void
+interface StepIdentificationProps {
+  onNext: (data: IdentificationData) => void
 }
 
-function GuitarBlock1({ onNext }: GuitarBlock1Props) {
+function StepIdentification({ onNext }: StepIdentificationProps) {
   const [brandOptions, setBrandOptions] = useState<string[]>([])
   const [modelOptions, setModelOptions] = useState<{ id: string; name: string }[]>([])
   const [locationOptions, setLocationOptions] = useState<string[]>([])
@@ -57,8 +57,8 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
     fetch("/api/countries").then(res => res.json()).then(setCountryOptions)
   }, [])
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<Block1Data>({
-    resolver: zodResolver(block1Schema),
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<IdentificationData>({
+    resolver: zodResolver(identificationSchema),
     defaultValues: {
       serial_number: "",
       brand: "",
@@ -71,7 +71,7 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
     },
   })
 
-  function handleNext(data: Block1Data) {
+  function handleNext(data: IdentificationData) {
     const { brand, country, custom_brand, custom_country } = data
   
     if (brand === "not_listed" && custom_brand) {
@@ -180,4 +180,4 @@ function GuitarBlock1({ onNext }: GuitarBlock1Props) {
   )
 }
 
-export default GuitarBlock1
+export default StepIdentification
