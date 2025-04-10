@@ -219,6 +219,10 @@ api.add_resource(Countries, '/api/countries')
 api.add_resource(SerialNumberLocations, '/api/serial-number-locations')
 api.add_resource(Brands, '/api/brands')
 
+api.add_resource(Pickups, '/api/pickups')
+api.add_resource(Switches, '/api/switches')
+api.add_resource(Controls, '/api/controls')
+
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
 
