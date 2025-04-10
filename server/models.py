@@ -56,6 +56,18 @@ model_controls = db.Table(
     db.Column('controls_id', db.Integer, db.ForeignKey('controls.id'), primary_key=True)
 )
 
+model_hardware_finish = db.Table(
+    'model_hardware_finish',
+    db.Column('model_id', db.Integer, db.ForeignKey('model.id'), primary_key=True),
+    db.Column('hardware_finish_id', db.Integer, db.ForeignKey('hardware_finish.id'), primary_key=True)
+)
+
+model_plastic_color = db.Table(
+    'model_plastic_color',
+    db.Column('model_id', db.Integer, db.ForeignKey('model.id'), primary_key=True),
+    db.Column('plastic_color_id', db.Integer, db.ForeignKey('plastic_color.id'), primary_key=True)
+)
+
 class User(db.Model):
     __tablename__ = 'user'
 
@@ -189,7 +201,6 @@ class Model(db.Model):
     scale_length = db.Column(db.Float, nullable=False)
     relic = db.Column(db.String(50), nullable=False)
     other_controls = db.Column(JSON, nullable=True)
-    hardware_finish = db.Column(JSON, nullable=False)
     pickup_configuration = db.Column(JSON, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -201,6 +212,9 @@ class Model(db.Model):
     pickguards = db.relationship('Pickguard', secondary='model_pickguard', back_populates='models')
     switches = db.relationship('Switch', secondary='model_switch', back_populates='models')
     controls = db.relationship('Controls', secondary='model_controls', back_populates='models')
+    hardware_finish = db.relationship('HardwareFinish', secondary='model_hardware_finish', back_populates='models')
+    plastic_color = db.relationship('PlasticColor', secondary='model_plastic_color', back_populates='models')
+
 
     # Many-to-One Relationships (Fixed parts of the model)
     neck_id = db.Column(db.Integer, db.ForeignKey('neck.id'), nullable=False)
@@ -260,10 +274,7 @@ class Model(db.Model):
     @validates('country')
     def validate_country(self, key, country):
         # List of countries where Stratocasters are manufactured
-        valid_countries = [
-            'United States', 'Mexico', 'Japan', 'China', 'South Korea', 'Indonesia',
-            'India', 'Vietnam', 'Malaysia'
-        ]
+        valid_countries = ['USA', 'Mexico', 'Japan', 'China', 'Indonesia', 'Korea', 'Custom'] 
         
         if country not in valid_countries:
             raise ValueError(f"Country must be a valid Stratocaster manufacturing location: {', '.join(valid_countries)}")
@@ -298,7 +309,6 @@ class UserGuitar(db.Model):
     weight = db.Column(db.String, nullable=True)
     relic = db.Column(db.String, nullable=False)
     other_controls = db.Column(db.String, nullable=True)
-    hardware_finish = db.Column(db.String, nullable=True)
     pickup_configuration = db.Column(db.String, nullable=False)
     modified = db.Column(db.Boolean, default=True)
     modifications = db.Column(db.String, nullable=True)
@@ -310,7 +320,7 @@ class UserGuitar(db.Model):
     model = db.relationship('Model', back_populates='user_guitars')
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     owner = db.relationship('User', back_populates='user_guitars')
-    images = db.relationship('Image', secondary=user_guitar_images, back_populates='user_guitars')
+    images = db.relationship('Image', secondary='user_guitar_images', back_populates='user_guitars')
     
     # Relationships to components
     body_id = db.Column(db.Integer, db.ForeignKey('body.id'))
@@ -357,6 +367,12 @@ class UserGuitar(db.Model):
 
     pickguard_id = db.Column(db.Integer, db.ForeignKey('pickguard.id'))
     pickguard = db.relationship('Pickguard', back_populates='user_guitars')
+
+    hardware_finish_id = db.Column(db.Integer, db.ForeignKey('hardware_finish.id'))
+    hardware_finish = db.relationship('HardwareFinish', back_populates='user_guitars')
+
+    plastic_color_id = db.Column(db.Integer, db.ForeignKey('plastic_color.id'))
+    plastic_color = db.relationship('PlasticColor', back_populates='user_guitars')
 
     def __init__(self, *args, **kwargs):
         """Set name to model name if unmodified and model exists upon creation."""
@@ -420,8 +436,7 @@ class GuitarPickup(db.Model):
     def validate_type(self, key, type_val):
         valid_types = [
             'Single-coil', 'Humbucker', 'Hot Rails', 'Noiseless', 'Lace Sensor',
-            'P90', 'Mini-humbucker', 'Active', 'Lipstick', 'Rail', 'Vintage', 
-            'Texas Special', 'Custom Shop', 'Other'
+            'P90', 'Mini-humbucker', 'Lipstick', 'Rail', 'Other'
         ]
         if type_val not in valid_types:
             raise ValueError(f"Pickup type must be one of: {', '.join(valid_types)}")
@@ -431,7 +446,7 @@ class GuitarPickup(db.Model):
     def validate_magnet(self, key, magnet):
         if magnet is not None:
             valid_magnets = ['Alnico II', 'Alnico III', 'Alnico IV', 'Alnico V', 
-                          'Ceramic', 'Neodymium', 'Samarium Cobalt', 'Other']
+                          'Ceramic', 'Neodymium', 'Other']
             if magnet not in valid_magnets:
                 raise ValueError(f"Magnet type must be one of: {', '.join(valid_magnets)}")
         return magnet
@@ -465,7 +480,7 @@ class Body(db.Model):
     def validate_wood(self, key, wood):
         if wood is not None:
             valid_woods = ['Alder', 'Ash', 'Basswood', 'Mahogany', 'Poplar', 'Pine', 
-                           'Maple', 'Korina', 'Walnut', 'Paulownia', 'Other']
+                           'Maple', 'Korina', 'Walnut', 'Other']
             if wood not in valid_woods:
                 raise ValueError(f"Body wood must be one of: {', '.join(valid_woods)}")
         return wood
@@ -510,7 +525,7 @@ class Neck(db.Model):
     @validates('wood')
     def validate_wood(self, key, wood):
         if wood is not None:
-            valid_woods = ['Maple', 'Mahogany', 'Roasted Maple', 'Flame Maple', 'Birdseye Maple', 'Other']
+            valid_woods = ['Maple', 'Mahogany', 'Roasted Maple', 'Flame Maple', 'Other']
             if wood not in valid_woods:
                 raise ValueError(f"Neck wood must be one of: {', '.join(valid_woods)}")
         return wood
@@ -607,7 +622,7 @@ class Frets(db.Model):
     @validates('material')
     def validate_material(self, key, material):
         if material is not None:
-            valid_materials = ['Nickel Silver', 'Stainless Steel', 'Jescar EVO Gold', 'Vintage', 'Other']
+            valid_materials = ['Nickel', 'Stainless Steel', 'Other']
             if material not in valid_materials:
                 raise ValueError(f"Fret material must be one of: {', '.join(valid_materials)}")
         return material
@@ -647,7 +662,7 @@ class Nut(db.Model):
     @validates('material')
     def validate_material(self, key, material):
         if material is not None:
-            valid_materials = ['Bone', 'Plastic', 'Graphite', 'Corian', 'Brass', 'Tusq', 'Other']
+            valid_materials = ['Bone', 'Plastic', 'Graphite', 'Brass', 'Tusq', 'Other']
             if material not in valid_materials:
                 raise ValueError(f"Nut material must be one of: {', '.join(valid_materials)}")
         return material
@@ -745,7 +760,6 @@ class Switch(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     positions = db.Column(db.Integer, nullable=False)
-    color = db.Column(db.String, nullable=False)
 
     # Relationships
     models = db.relationship('Model', secondary='model_switch', back_populates='switches')
@@ -756,13 +770,6 @@ class Switch(db.Model):
         if not 2 <= positions <= 7:
             raise ValueError("Switch positions must be between 2 and 7")
         return positions
-    
-    @validates('color')
-    def validate_color(self, key, color):
-        valid_colors = ['White', 'Black', 'Cream', 'Mint Green', 'Aged White', 'Parchment', 'Other']
-        if color not in valid_colors:
-            raise ValueError(f"Switch color must be one of: {', '.join(valid_colors)}")
-        return color
 
 # Controls Model
 class Controls(db.Model):
@@ -770,18 +777,10 @@ class Controls(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     configuration = db.Column(db.String, nullable=False)
-    color = db.Column(db.String, nullable=False)
 
     # Relationships
     models = db.relationship('Model', secondary='model_controls', back_populates='controls')
     user_guitars = db.relationship('UserGuitar', back_populates='controls')
-    
-    @validates('color')
-    def validate_color(self, key, color):
-        valid_colors = ['White', 'Black', 'Cream', 'Mint Green', 'Aged White', 'Parchment', 'Other']
-        if color not in valid_colors:
-            raise ValueError(f"Control color must be one of: {', '.join(valid_colors)}")
-        return color
 
 # Tuning Machine Model
 class TuningMachine(db.Model):
@@ -871,7 +870,6 @@ class Pickguard(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     ply_count = db.Column(db.Integer, nullable=True)
     screws = db.Column(db.Integer, nullable=False)
-    color = db.Column(db.String, nullable=False)
 
     # Relationships
     models = db.relationship('Model', secondary='model_pickguard', back_populates='pickguards')
@@ -889,12 +887,32 @@ class Pickguard(db.Model):
             raise ValueError("Pickguard ply count must be 1, 2, 3, 4, or 5")
         return ply_count
     
-    @validates('color')
-    def validate_color(self, key, color):
-        valid_colors = [
-            'White', 'Black', 'Cream', 'Mint Green', 'Parchment', 'Aged White', 
-            'Tortoise', 'Red Tortoise', 'Pearloid', 'Anodized', 'Mirror', 'Other'
-        ]
-        if color not in valid_colors:
-            raise ValueError(f"Pickguard color must be one of: {', '.join(valid_colors)}")
-        return color
+class HardwareFinish(db.Model):
+    __tablename__ = 'hardware_finish'
+
+    id = db.Column(db.Integer, primary_key=True)
+    label = db.Column(db.String(50), nullable=False, unique=True)
+
+    user_guitars = db.relationship('UserGuitar', back_populates='hardware_finish')
+    models = db.relationship('Model', secondary='model_hardware_finish', back_populates='hardware_finish')
+
+    @validates('label')
+    def validate_label(self, key, value):
+        if value not in ['Chrome', 'Nickel', 'Gold', 'Black', 'Brushed', 'Cosmo Black', 'Aged Chrome', 'Raw Steel', 'Relic Nickel']:
+            raise ValueError(f"'{value}' is not a recognized hardware finish")
+        return value
+    
+class PlasticColor(db.Model):
+    __tablename__ = 'plastic_color'
+
+    id = db.Column(db.Integer, primary_key=True)
+    label = db.Column(db.String(50), nullable=False, unique=True)
+
+    user_guitars = db.relationship('UserGuitar', back_populates='plastic_color')
+    models = db.relationship('Model', secondary='model_plastic_color', back_populates='plastic_color')
+
+    @validates('label')
+    def validate_label(self, key, value):
+        if value not in ['White', 'Black', 'Parchment', 'Mint Green', 'Aged White', 'Cream', 'Pearloid', 'Tortoiseshell', 'Anodized Gold', 'Gray', 'Ivory', 'Custom']:
+            raise ValueError(f"'{value}' is not a recognized plastic color")
+        return value

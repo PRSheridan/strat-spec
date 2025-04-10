@@ -4,7 +4,7 @@ from marshmallow import fields
 from models import (
     User, UserGuitar, Model, Image, Body, Neck, Headstock, Fretboard, Nut, Frets, Inlays,
     Bridge, Saddles, Switch, Controls, TuningMachine, StringTree, NeckPlate, Pickguard,
-    GuitarPickup
+    GuitarPickup, HardwareFinish, PlasticColor
 )
 
 class ImageSchema(SQLAlchemyAutoSchema):
@@ -52,14 +52,6 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 return {}
         return obj.other_controls or {}
 
-    def get_hardware_finish(self, obj):
-        if isinstance(obj.hardware_finish, str):
-            try:
-                return json.loads(obj.hardware_finish)
-            except json.JSONDecodeError:
-                return {}
-        return obj.hardware_finish or {}
-
     def get_pickup_configuration(self, obj):
         if isinstance(obj.pickup_configuration, str):
             try:
@@ -77,11 +69,12 @@ class ModelSchema(SQLAlchemyAutoSchema):
     scale_length = fields.Float()
     relic = fields.String()
     other_controls = fields.Method("get_other_controls")
-    hardware_finish = fields.Method("get_hardware_finish")
     pickup_configuration = fields.Method("get_pickup_configuration")
     created_at = fields.DateTime()
     updated_at = fields.DateTime()
 
+    hardware_finish = fields.List(fields.Nested(lambda: HardwareFinishSchema(only=["id", "label"])))
+    plastic_color = fields.List(fields.Nested(lambda: PlasticColorSchema(only=["id", "label"])))
     pickups = fields.List(fields.Nested(lambda: GuitarPickupSchema(exclude=["models"])))
     bodies = fields.List(fields.Nested(lambda: BodySchema(exclude=["models", "user_guitars"])))
     fretboards = fields.List(fields.Nested(lambda: FretboardSchema(exclude=["models", "user_guitars"])))
@@ -102,7 +95,6 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
     user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(only=["id", "name", "year"])))
 
-
 class UserGuitarSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = UserGuitar
@@ -121,13 +113,14 @@ class UserGuitarSchema(SQLAlchemyAutoSchema):
     weight = fields.String(allow_none=True)
     relic = fields.String()
     other_controls = fields.String(allow_none=True)
-    hardware_finish = fields.String(allow_none=True)  # Changed to String
+    pickup_configuration = fields.String()
     modified = fields.Boolean(allow_none=True)
     modifications = fields.String(allow_none=True)
-    pickup_configuration = fields.String()  # Changed to String
     created_at = fields.DateTime()
     updated_at = fields.DateTime()
 
+    hardware_finish = fields.Nested(lambda: HardwareFinishSchema(only=["id", "label"]), allow_none=True)
+    plastic_color = fields.Nested(lambda: PlasticColorSchema(only=["id", "label"]), allow_none=True)
     pickups = fields.List(fields.Nested(lambda: GuitarPickupSchema(exclude=["user_guitars"])))
     owner = fields.Nested(lambda: UserSchema(exclude=["user_guitars"]))
     model = fields.Nested(lambda: ModelSchema(only=["id", "model_name", "year_range"]))
@@ -327,7 +320,6 @@ class SwitchSchema(SQLAlchemyAutoSchema):
 
     id = fields.Integer()
     positions = fields.Integer()
-    color = fields.String()
 
     models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["switches"])))
     user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["switch"])))
@@ -341,7 +333,6 @@ class ControlsSchema(SQLAlchemyAutoSchema):
 
     id = fields.Integer()
     configuration = fields.String()
-    color = fields.String()
 
     models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["controls"])))
     user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["controls"])))
@@ -399,7 +390,25 @@ class PickguardSchema(SQLAlchemyAutoSchema):
     id = fields.Integer()
     ply_count = fields.Integer(allow_none=True)
     screws = fields.Integer()
-    color = fields.String()
 
     models = fields.List(fields.Nested(lambda: ModelSchema(exclude=["pickguards"])))
     user_guitars = fields.List(fields.Nested(lambda: UserGuitarSchema(exclude=["pickguard"])))
+
+class HardwareFinishSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = HardwareFinish
+        load_instance = True
+        ordered = True
+
+    id = fields.Integer()
+    label = fields.String()
+
+
+class PlasticColorSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = PlasticColor
+        load_instance = True
+        ordered = True
+
+    id = fields.Integer()
+    label = fields.String()

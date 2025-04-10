@@ -12,7 +12,7 @@ from app import app
 from models import (
     db, User, GuitarPickup, Body, Neck, Headstock, Fretboard, Frets, Nut,
     Inlays, Bridge, Saddles, Switch, Controls, TuningMachine, StringTree, 
-    NeckPlate, Pickguard, Model, UserGuitar
+    NeckPlate, Pickguard, Model, UserGuitar, HardwareFinish, PlasticColor
 )
 
 fake = Faker()
@@ -53,12 +53,11 @@ def create_guitar_pickups(num_pickups=15):
     """Generate guitar pickups with valid attributes and relationships."""
     valid_types = [
         'Single-coil', 'Humbucker', 'Hot Rails', 'Noiseless', 'Lace Sensor',
-        'P90', 'Mini-humbucker', 'Active', 'Lipstick', 'Rail', 'Vintage', 
-        'Texas Special', 'Custom Shop', 'Other'
+        'P90', 'Mini-humbucker', 'Lipstick', 'Rail', 'Other'
     ]
     
     valid_magnets = ['Alnico II', 'Alnico III', 'Alnico IV', 'Alnico V', 
-                     'Ceramic', 'Neodymium', 'Samarium Cobalt', 'Other', None]
+                     'Ceramic', 'Neodymium', 'Other', None]
 
     valid_covers = ['None', 'Chrome', 'Nickel', 'Gold', 'Black', 'Cream', 'Zebra', 'Other', None]
 
@@ -85,7 +84,7 @@ def create_guitar_pickups(num_pickups=15):
 def create_bodies(num_bodies=15):
     """Generate guitar bodies with valid attributes and relationships."""
     valid_woods = ['Alder', 'Ash', 'Basswood', 'Mahogany', 'Poplar', 'Pine', 
-                   'Maple', 'Korina', 'Walnut', 'Paulownia', 'Other', None]
+                   'Maple', 'Korina', 'Walnut', 'Other', None]
 
     valid_contours = ['Shallow', 'Deep', None]
 
@@ -114,7 +113,7 @@ def create_bodies(num_bodies=15):
 
 def create_necks(num_necks=15):
     """Generate guitar necks with valid attributes and relationships."""
-    valid_woods = ['Maple', 'Mahogany', 'Roasted Maple', 'Flame Maple', 'Birdseye Maple', 'Other', None]
+    valid_woods = ['Maple', 'Mahogany', 'Roasted Maple', 'Flame Maple', 'Other', None]
 
     valid_finishes = ['Gloss', 'Satin', 'Natural']
 
@@ -175,7 +174,7 @@ def create_fretboards(num_fretboards=10):
 
 def create_frets(num_frets=10):
     """Generate frets with valid attributes and relationships."""
-    valid_materials = ['Nickel Silver', 'Stainless Steel', 'Jescar EVO Gold', 'Vintage', 'Other', None]
+    valid_materials = ['Nickel', 'Stainless Steel', 'Other', None]
     valid_sizes = ['Vintage', 'Medium', 'Jumbo', 'Medium Jumbo', 'Narrow Tall', 'Other', None]
 
     frets = []
@@ -264,13 +263,11 @@ def create_saddles(num_saddles=10):
 
 def create_switches(num_switches=10):
     """Generate switches with valid attributes and relationships."""
-    valid_colors = ['White', 'Black', 'Cream', 'Mint Green', 'Aged White', 'Parchment', 'Other']
 
     switches = []
     for _ in range(num_switches):
         switch = Switch(
             positions=randint(2, 7),
-            color=choice(valid_colors)
         )
         switches.append(switch)
 
@@ -280,13 +277,11 @@ def create_switches(num_switches=10):
 
 def create_controls(num_controls=10):
     """Generate controls with valid attributes and relationships."""
-    valid_colors = ['White', 'Black', 'Cream', 'Mint Green', 'Aged White', 'Parchment', 'Other']
 
     controls = []
     for _ in range(num_controls):
         control = Controls(
             configuration=fake.sentence(nb_words=3).rstrip('.'),
-            color=choice(valid_colors)
         )
         controls.append(control)
 
@@ -348,17 +343,12 @@ def create_neck_plates(num_plates=10):
 def create_pickguards(num_pickguards=10):
     """Generate pickguards with valid attributes and relationships."""
     valid_ply_counts = [1, 2, 3, 4, 5, None]
-    valid_colors = [
-        'White', 'Black', 'Cream', 'Mint Green', 'Parchment', 'Aged White', 
-        'Tortoise', 'Red Tortoise', 'Pearloid', 'Anodized', 'Mirror', 'Other'
-    ]
 
     pickguards = []
     for _ in range(num_pickguards):
         pickguard = Pickguard(
             ply_count=choice(valid_ply_counts),
             screws=randint(6, 13),  # Screws must be between 6 and 13
-            color=choice(valid_colors)
         )
         pickguards.append(pickguard)
 
@@ -366,43 +356,42 @@ def create_pickguards(num_pickguards=10):
     db.session.commit()
     return pickguards
 
+def create_hardware_finishes():
+    """Seed standard hardware finish options."""
+    labels = ['Chrome', 'Nickel', 'Gold', 'Black', 'Other']
+    finishes = [HardwareFinish(label=label) for label in labels]
+    db.session.bulk_save_objects(finishes)
+    db.session.commit()
+    return finishes
+
+
+def create_plastic_colors():
+    """Seed standard plastic color options."""
+    labels = [
+        'White', 'Black', 'Cream', 'Mint Green', 'Parchment',
+        'Aged White', 'Tortoise', 'Red Tortoise', 'Pearloid',
+        'Anodized', 'Mirror', 'Other'
+    ]
+    colors = [PlasticColor(label=label) for label in labels]
+    db.session.bulk_save_objects(colors)
+    db.session.commit()
+    return colors
+
+
 def create_models(num_models=10):
     """Generate guitar models with valid attributes and relationships."""
-    valid_countries = [
-        'United States', 'Mexico', 'Japan', 'China', 'South Korea', 'Indonesia',
-        'India', 'Vietnam', 'Malaysia'
-    ]
+    valid_countries = ['USA', 'Mexico', 'Japan', 'China', 'Indonesia', 'Korea', 'Custom']
     valid_relics = ['None', 'Light', 'Medium', 'Heavy', 'Custom']
-    valid_hardware_finishes = ['Chrome', 'Nickel', 'Gold', 'Black', 'Other']
     valid_pickup_configurations = ['SSS', 'HSS', 'HH', 'HSH', 'HS', 'Other']
     valid_model_names = [
-        "Stratocaster",
-        "American Standard",
-        "Deluxe",
-        "Player Series",
-        "Custom Shop '62",
-        "American Vintage '59",
-        "American Vintage '62",
-        "American Vintage '65",
-        "American Professional",
-        "American Ultra",
-        "American Performer",
-        "Vintera '50s Stratocaster",
-        "Vintera '60s Stratocaster",
-        "Vintera '70s Stratocaster",
-        "Eric Clapton Signature",
-        "Jimi Hendrix Signature",
-        "David Gilmour Signature",
-        "Jeff Beck Signature",
-        "SRV Signature",
-        "American Special",
-        "Highway One",
-        "American Original '50s",
-        "American Original '60s",
-        "American Original '70s",
-        "Custom Shop '50s",
-        "Custom Shop '60s",
-        "Custom Shop '70s",
+        "Stratocaster", "American Standard", "American Deluxe", "American Professional", "American Ultra", "American Performer",
+        "Player Series", "Player Plus", "Vintera '50s Stratocaster", "Vintera '60s Stratocaster", "Vintera '70s Stratocaster", "Highway One",
+        "American Special", "American Original '50s", "American Original '60s", "American Original '70s", "Classic Series '60s", "Classic Series '70s",
+        "Custom Shop '50s", "Custom Shop '60s", "Custom Shop '70s", "Custom Shop '59", "Custom Shop '62", "Deluxe Stratocaster",
+        "Deluxe HSS", "Deluxe Player", "Roadhouse Strat", "Lone Star Strat", "Fat Strat", "Power Strat",
+        "Vintage Reissue '57", "Vintage Reissue '62", "Vintage Reissue '65", "Vintage Reissue '68", "Vintage Hot Rod '50s", "Vintage Hot Rod '60s",
+        "American Vintage II '57", "American Vintage II '61", "American Vintage II '73", "Limited Edition '59 Journeyman", "Custom Classic", "Pro Series Strat",
+        "Eric Clapton Signature", "Jimi Hendrix Signature", "Jeff Beck Signature", "Tom Morello Soul Power", "EOB Sustainer", "Cory Wong Strat"
     ]
 
     models = []
@@ -416,7 +405,6 @@ def create_models(num_models=10):
             scale_length=round(uniform(20.0, 30.0), 1),
             relic=choice(valid_relics),
             other_controls=sample(["Blend Knob", "Kill Switch", "Mid Boost"], randint(0, 2)),
-            hardware_finish=sample(valid_hardware_finishes, randint(1, 3)),
             pickup_configuration=sample(valid_pickup_configurations, randint(1, 3)),
             neck=choice(Neck.query.all()),
             headstock=choice(Headstock.query.all()),
@@ -440,6 +428,8 @@ def create_models(num_models=10):
         model.pickguards = sample(Pickguard.query.all(), randint(1, 2))
         model.switches = sample(Switch.query.all(), randint(1, 2))
         model.controls = sample(Controls.query.all(), randint(1, 2))
+        model.hardware_finish = sample(HardwareFinish.query.all(), randint(1, 2))
+        model.plastic_color = sample(PlasticColor.query.all(), randint(1, 2))
 
         models.append(model)
 
@@ -475,6 +465,8 @@ def create_user_guitars(num_guitars=user_guitar_amt):
     string_trees = StringTree.query.all()
     neck_plates = NeckPlate.query.all()
     pickguards = Pickguard.query.all()
+    hardware_finishes = HardwareFinish.query.all()
+    plastic_colors = PlasticColor.query.all()
 
     for _ in range(num_guitars):
         owner = choice(users)
@@ -495,7 +487,6 @@ def create_user_guitars(num_guitars=user_guitar_amt):
             weight=f"{round(uniform(6.0, 10.0), 1)} lbs" if randint(0, 1) else None,
             relic=choice(valid_relics),
             other_controls=fake.sentence() if randint(0, 1) else None,
-            hardware_finish=choice(['Chrome', 'Nickel', 'Gold', 'Black', 'Other']) if randint(0, 1) else None,
             pickup_configuration=choice(valid_pickup_configurations),
             modified=modified,
             modifications=modifications,
@@ -522,6 +513,8 @@ def create_user_guitars(num_guitars=user_guitar_amt):
         user_guitar.string_tree = choice(string_trees) if string_trees else None
         user_guitar.neck_plate = choice(neck_plates) if neck_plates else None
         user_guitar.pickguard = choice(pickguards) if pickguards else None
+        user_guitar.hardware_finish = choice(hardware_finishes) if hardware_finishes else None
+        user_guitar.plastic_color = choice(plastic_colors) if plastic_colors else None
 
         # Many-to-Many Relationships
         user_guitar.pickups = sample(GuitarPickup.query.all(), randint(1, 3))
