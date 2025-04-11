@@ -191,7 +191,7 @@ def create_frets(num_frets=10):
 
 def create_nuts(num_nuts=10):
     """Generate nuts with valid attributes and relationships."""
-    valid_materials = ['Bone', 'Plastic', 'Graphite', 'Corian', 'Brass', 'Tusq', 'Other', None]
+    valid_materials = ['Bone', 'Plastic', 'Graphite', 'Brass', 'Tusq', 'Other']
 
     nuts = []
     for _ in range(num_nuts):
@@ -348,7 +348,7 @@ def create_pickguards(num_pickguards=10):
     for _ in range(num_pickguards):
         pickguard = Pickguard(
             ply_count=choice(valid_ply_counts),
-            screws=randint(6, 13),  # Screws must be between 6 and 13
+            screws=randint(6, 13),
         )
         pickguards.append(pickguard)
 
@@ -357,26 +357,23 @@ def create_pickguards(num_pickguards=10):
     return pickguards
 
 def create_hardware_finishes():
-    """Seed standard hardware finish options."""
-    labels = ['Chrome', 'Nickel', 'Gold', 'Black', 'Other']
-    finishes = [HardwareFinish(label=label) for label in labels]
-    db.session.bulk_save_objects(finishes)
+    """Create one HardwareFinish object per valid label."""
+    valid_hardware_finishes = ['Chrome', 'Nickel', 'Gold', 'Black', 'Other']
+    hardware_finishes = [HardwareFinish(label=label) for label in valid_hardware_finishes]
+    db.session.bulk_save_objects(hardware_finishes)
     db.session.commit()
-    return finishes
-
+    return hardware_finishes
 
 def create_plastic_colors():
-    """Seed standard plastic color options."""
-    labels = [
-        'White', 'Black', 'Cream', 'Mint Green', 'Parchment',
-        'Aged White', 'Tortoise', 'Red Tortoise', 'Pearloid',
-        'Anodized', 'Mirror', 'Other'
+    """Create one PlasticColor object per valid label."""
+    valid_plastic_colors = [
+        'White', 'Black', 'Parchment', 'Mint Green', 'Aged White', 'Cream',
+        'Pearloid', 'Tortoiseshell', 'Anodized Gold', 'Gray', 'Other'
     ]
-    colors = [PlasticColor(label=label) for label in labels]
-    db.session.bulk_save_objects(colors)
+    plastic_colors = [PlasticColor(label=label) for label in valid_plastic_colors]
+    db.session.bulk_save_objects(plastic_colors)
     db.session.commit()
-    return colors
-
+    return plastic_colors
 
 def create_models(num_models=10):
     """Generate guitar models with valid attributes and relationships."""
@@ -565,6 +562,8 @@ if __name__ == "__main__":
         create_string_trees()
         create_neck_plates()
         create_pickguards()
+        create_hardware_finishes()
+        create_plastic_colors()
         create_models()
         create_user_guitars()
 

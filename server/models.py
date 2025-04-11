@@ -898,7 +898,7 @@ class HardwareFinish(db.Model):
 
     @validates('label')
     def validate_label(self, key, value):
-        if value not in ['Chrome', 'Nickel', 'Gold', 'Black', 'Brushed', 'Cosmo Black', 'Aged Chrome', 'Raw Steel', 'Relic Nickel']:
+        if value not in ['Chrome', 'Nickel', 'Gold', 'Black','Relic Nickel', 'Other']:
             raise ValueError(f"'{value}' is not a recognized hardware finish")
         return value
     
@@ -913,6 +913,6 @@ class PlasticColor(db.Model):
 
     @validates('label')
     def validate_label(self, key, value):
-        if value not in ['White', 'Black', 'Parchment', 'Mint Green', 'Aged White', 'Cream', 'Pearloid', 'Tortoiseshell', 'Anodized Gold', 'Gray', 'Ivory', 'Custom']:
+        if value not in ['White', 'Black', 'Parchment', 'Mint Green', 'Aged White', 'Cream', 'Pearloid', 'Tortoiseshell', 'Anodized Gold', 'Gray', 'Other']:
             raise ValueError(f"'{value}' is not a recognized plastic color")
         return value

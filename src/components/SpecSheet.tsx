@@ -89,7 +89,7 @@ function SpecSheet({ item, type }: SpecSheetProps) {
 
                 <div className="spec-sheet-sub">
                     <h2>Finish & Hardware</h2>
-                    <p>Hardware Finish: {guitar.hardware_finish ?? "N/A"}</p>
+                    <p>Hardware Finish: {guitar.hardware_finish?.label ?? "N/A"}</p>
                     <p>Relic: {guitar.relic ?? "None"}</p>
                 </div>
 
