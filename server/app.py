@@ -3,9 +3,7 @@
 from flask import request, session, jsonify
 from flask_restful import Resource
 from marshmallow import ValidationError
-#temporary randomization of UserGuitars
 from sqlalchemy.sql.expression import func
-
 
 from config import app, db, api
 from models import User, Image, UserGuitar, Model
@@ -184,8 +182,39 @@ class ModelByName(Resource):
         db.session.delete(model)
         db.session.commit()
         return {}, 204
-    
-#specific guitar parts for GuitarForm:
+
+class IdentificationForm(Resource):
+    def get(self):
+        brands = db.session.query(Models.brand).distinct().all()
+        brand_list = [b[0] for b in brands if b[0] is not None]
+
+        locations = db.session.query(Models.serial_number_location).distinct().all()
+        location_list = [l[0] for l in locations if l[0] is not None]
+
+        countries = db.session.query(Models.country).distinct().all()
+        country_list = [c[0] for c in countries if c[0] is not None]
+
+        return {
+            "brands": brand_list,
+            "serial_number_locations": location_list,
+            "countries": country_list
+        }, 200
+
+
+class PhysicalForm(Resource):
+    pass
+
+class BodyForm(Resource):
+    pass
+
+class NeckForm(Resource):
+    pass
+
+class ElectronicsForm(Resource):
+    pass
+
+
+#specific guitar parts for GuitarForm to be replaced by form page specific requests
 class Countries(Resource):
     def get(self):
         countries = db.session.query(UserGuitar.country).distinct().all()
@@ -215,13 +244,10 @@ api.add_resource(GuitarBySN, '/api/guitar/<string:serial_number>')
 api.add_resource(Models, '/api/models')
 api.add_resource(ModelByName, '/api/model/<string:model_name>')
 
+api.add_resource(IdentificationForm, '/api/identification-form')
 api.add_resource(Countries, '/api/countries')
 api.add_resource(SerialNumberLocations, '/api/serial-number-locations')
 api.add_resource(Brands, '/api/brands')
-
-#api.add_resource(Pickups, '/api/pickups')
-#api.add_resource(Switches, '/api/switches')
-#api.add_resource(Controls, '/api/controls')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

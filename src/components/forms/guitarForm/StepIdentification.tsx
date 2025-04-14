@@ -51,10 +51,19 @@ function StepIdentification({ onNext }: StepIdentificationProps) {
 
   useEffect(() => {
     console.log("Errors:", errors)
-    fetch("/api/brands").then(res => res.json()).then(setBrandOptions)
-    fetch("/api/models").then(res => res.json()).then(models => setModelOptions(models.map((model: any) => ({id: model.id, name: model.model_name}))))
-    fetch("/api/serial-number-locations").then(res => res.json()).then(setLocationOptions)
-    fetch("/api/countries").then(res => res.json()).then(setCountryOptions)
+    fetch('/api/identification-form')
+      .then(res => res.json())
+      .then(data => {
+        setBrandOptions(data.brands)
+        setLocationOptions(data.serial_number_locations)
+        setCountryOptions(data.countries)
+      })
+    fetch("/api/models")
+      .then(res => res.json())
+      .then(models => {
+        setModelOptions(models.map((model: any) =>
+          ({id: model.id, name: model.model_name})))
+      }) 
   }, [])
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm<IdentificationData>({
