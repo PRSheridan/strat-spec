@@ -182,32 +182,85 @@ class ModelByName(Resource):
         db.session.delete(model)
         db.session.commit()
         return {}, 204
+    
+#guitarForm methods -------------------------------------------------------------------------
+class Brands(Resource):
+  def get(self):
+    brands = db.session.query(Model.brand).distinct().all()
+    brand_list = [b[0] for b in brands if b[0] is not None]
+
+    return brand_list
+  
+class SerialNumberLocations(Resource):
+  def get(self):
+    locations = db.session.query(Model.serial_number_location).distinct().all()
+    location_list = [l[0] for l in locations if l[0] is not None]
+
+    return location_list
+  
+class Countries(Resource):
+  def get(self):
+    countries = db.session.query(Model.country).distinct().all()
+    country_list = [c[0] for c in countries if c[0] is not None]
+
+    return country_list
+
+class PlasticColors(Resource):
+    pass
+
+class HardwareColors(Resource):
+    pass
+
+class BodyWoods(Resource):
+    pass
+
+class BodyColors(Resource):
+    pass
+
+class BridgeModels(Resource):
+    pass
+
+class SaddleStyles(Resource):
+    pass
+    
+class SaddleMaterials(Resource):
+    pass
+
+
+
+
 
 class IdentificationForm(Resource):
     def get(self):
-        brands = db.session.query(Models.brand).distinct().all()
-        brand_list = [b[0] for b in brands if b[0] is not None]
+      brand_list = Brands.get(self)
+      location_list = SerialNumberLocations.get(self)
+      country_list = Countries.get(self)
 
-        locations = db.session.query(Models.serial_number_location).distinct().all()
-        location_list = [l[0] for l in locations if l[0] is not None]
+      print(country_list[0])
 
-        countries = db.session.query(Models.country).distinct().all()
-        country_list = [c[0] for c in countries if c[0] is not None]
-
-        return {
-            "brands": brand_list,
-            "serial_number_locations": location_list,
-            "countries": country_list
-        }, 200
+      return {
+          "brands": brand_list[0],
+          "serial_number_locations": location_list[0],
+          "countries": country_list[0]
+      }, 200
 
 
 class PhysicalForm(Resource):
-    pass
+    def get(self):
+        #plastic color
+        #hardware color
+        pass
 
 class BodyForm(Resource):
+    #body wood
+    #body color
+    #bridge model
+    #saddle style
+    #saddle material
     pass
 
 class NeckForm(Resource):
+    #
     pass
 
 class ElectronicsForm(Resource):
@@ -243,7 +296,6 @@ api.add_resource(Guitars, '/api/guitars')
 api.add_resource(GuitarBySN, '/api/guitar/<string:serial_number>')
 api.add_resource(Models, '/api/models')
 api.add_resource(ModelByName, '/api/model/<string:model_name>')
-
 api.add_resource(IdentificationForm, '/api/identification-form')
 api.add_resource(Countries, '/api/countries')
 api.add_resource(SerialNumberLocations, '/api/serial-number-locations')
@@ -251,6 +303,8 @@ api.add_resource(Brands, '/api/brands')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
+
+  #rework all resources. groups for specific form pages calling individual functions
 
 
 

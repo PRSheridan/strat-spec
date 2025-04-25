@@ -215,7 +215,6 @@ class Model(db.Model):
     hardware_finish = db.relationship('HardwareFinish', secondary='model_hardware_finish', back_populates='models')
     plastic_color = db.relationship('PlasticColor', secondary='model_plastic_color', back_populates='models')
 
-
     # Many-to-One Relationships (Fixed parts of the model)
     neck_id = db.Column(db.Integer, db.ForeignKey('neck.id'), nullable=False)
     neck = db.relationship('Neck', back_populates='models')

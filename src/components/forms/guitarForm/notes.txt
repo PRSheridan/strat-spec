@@ -1,0 +1,25 @@
+	"BodySpecs.tsx": {
+	  "body": {
+	    "label": "Body",
+	    "fields": [
+	      "wood",
+	      "contour",
+	      "routing",
+	      "chambering",
+	      "binding",
+	      "finish",
+	      "color"
+	    ]
+	  },
+	  "bridge": {
+	    "label": "Bridge",
+	    "fields": [
+	      "model",
+	      "screws",
+	      "spacing",
+	      "tremolo"
+	    ]
+	  },
+	  "saddles": {
+	    "label": "Saddles",
+	    "field
