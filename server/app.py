@@ -206,13 +206,25 @@ class Countries(Resource):
     return country_list
 
 class PlasticColors(Resource):
-    pass
+  def get(self):
+    plastic_colors = db.session.query(Model.plastic_color).distinct().all()
+    color_list = [c[0] for c in plastic_colors if c[0] is not None]
 
-class HardwareColors(Resource):
-    pass
+    return color_list
+
+class HardwareFinishes(Resource):
+  def get(self):
+    hardware_finishes = db.session.query(Model.hardware_finish).distinct().all()
+    finish_list = [c[0] for c in hardware_finishes if c[0] is not None]
+
+    return finish_list
 
 class BodyWoods(Resource):
-    pass
+  def get(self):
+    hardware_finishes = db.session.query(Model.hardware_finish).distinct().all()
+    finish_list = [c[0] for c in hardware_finishes if c[0] is not None]
+
+    return finish_list
 
 class BodyColors(Resource):
     pass
@@ -260,10 +272,23 @@ class BodyForm(Resource):
     pass
 
 class NeckForm(Resource):
-    #
+    # neck wood
+    # neck shape
+    # headstock shape
+    # headstock decal
+    # fretboard material
+    # nut material
+    # inlay shape
+    # inlay material
+    # tuner model
+    # string tree type
     pass
 
 class ElectronicsForm(Resource):
+    # pickup type
+    # pickup magnet
+    # pickup cover
+    # control configuration
     pass
 
 
