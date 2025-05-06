@@ -6,7 +6,9 @@ from marshmallow import ValidationError
 from sqlalchemy.sql.expression import func
 
 from config import app, db, api
-from models import User, Image, UserGuitar, Model
+from models import User, Image, UserGuitar, Model, Body, Bridge, Saddle, Neck, Headstock, \
+    Fretboard, Nut, Inlays, TuningMachine, StringTree, GuitarPickup, Controls
+
 from schemas import UserSchema, UserGuitarSchema, ModelSchema
 
 # Instantiate schema objects
@@ -183,64 +185,139 @@ class ModelByName(Resource):
         db.session.commit()
         return {}, 204
     
-#guitarForm methods -------------------------------------------------------------------------
+# --- Identification Form ---
+
 class Brands(Resource):
-  def get(self):
-    brands = db.session.query(Model.brand).distinct().all()
-    brand_list = [b[0] for b in brands if b[0] is not None]
+    def get(self):
+        brands = db.session.query(Model.brand).distinct().all()
+        return [b[0] for b in brands if b[0]]
 
-    return brand_list
-  
 class SerialNumberLocations(Resource):
-  def get(self):
-    locations = db.session.query(Model.serial_number_location).distinct().all()
-    location_list = [l[0] for l in locations if l[0] is not None]
+    def get(self):
+        locations = db.session.query(Model.serial_number_location).distinct().all()
+        return [l[0] for l in locations if l[0]]
 
-    return location_list
-  
 class Countries(Resource):
-  def get(self):
-    countries = db.session.query(Model.country).distinct().all()
-    country_list = [c[0] for c in countries if c[0] is not None]
+    def get(self):
+        countries = db.session.query(Model.country).distinct().all()
+        return [c[0] for c in countries if c[0]]
 
-    return country_list
-
-class PlasticColors(Resource):
-  def get(self):
-    plastic_colors = db.session.query(Model.plastic_color).distinct().all()
-    color_list = [c[0] for c in plastic_colors if c[0] is not None]
-
-    return color_list
-
-class HardwareFinishes(Resource):
-  def get(self):
-    hardware_finishes = db.session.query(Model.hardware_finish).distinct().all()
-    finish_list = [c[0] for c in hardware_finishes if c[0] is not None]
-
-    return finish_list
+# --- Body ---
 
 class BodyWoods(Resource):
-  def get(self):
-    hardware_finishes = db.session.query(Model.hardware_finish).distinct().all()
-    finish_list = [c[0] for c in hardware_finishes if c[0] is not None]
-
-    return finish_list
+    def get(self):
+        woods = db.session.query(Body.wood).join(Model.bodies).distinct().all()
+        return [w[0] for w in woods if w[0]]
 
 class BodyColors(Resource):
-    pass
+    def get(self):
+        colors = db.session.query(Body.color).join(Model.bodies).distinct().all()
+        return [c[0] for c in colors if c[0]]
+
+# --- Bridge & Saddles ---
 
 class BridgeModels(Resource):
-    pass
+    def get(self):
+        models = db.session.query(Bridge.model).join(Model.bridge).distinct().all()
+        return [m[0] for m in models if m[0]]
 
 class SaddleStyles(Resource):
-    pass
-    
+    def get(self):
+        styles = db.session.query(Saddle.style).join(Model.saddles).distinct().all()
+        return [s[0] for s in styles if s[0]]
+
 class SaddleMaterials(Resource):
-    pass
+    def get(self):
+        materials = db.session.query(Saddle.material).join(Model.saddles).distinct().all()
+        return [m[0] for m in materials if m[0]]
 
+# --- Neck & Headstock ---
 
+class NeckWoods(Resource):
+    def get(self):
+        woods = db.session.query(Neck.wood).join(Model.neck).distinct().all()
+        return [w[0] for w in woods if w[0]]
 
+class NeckShapes(Resource):
+    def get(self):
+        shapes = db.session.query(Neck.shape).join(Model.neck).distinct().all()
+        return [s[0] for s in shapes if s[0]]
 
+class HeadstockShapes(Resource):
+    def get(self):
+        shapes = db.session.query(Headstock.shape).join(Model.headstock).distinct().all()
+        return [s[0] for s in shapes if s[0]]
+
+class HeadstockDecals(Resource):
+    def get(self):
+        decals = db.session.query(Headstock.decal_style).join(Model.headstock).distinct().all()
+        return [d[0] for d in decals if d[0]]
+
+# --- Fretboard / Frets / Nut ---
+
+class FretboardMaterials(Resource):
+    def get(self):
+        materials = db.session.query(Fretboard.material).join(Model.fretboards).distinct().all()
+        return [m[0] for m in materials if m[0]]
+
+class NutMaterials(Resource):
+    def get(self):
+        materials = db.session.query(Nut.material).join(Model.nut).distinct().all()
+        return [m[0] for m in materials if m[0]]
+
+class InlayShapes(Resource):
+    def get(self):
+        shapes = db.session.query(Inlays.shape).join(Model.inlays).distinct().all()
+        return [s[0] for s in shapes if s[0]]
+
+class InlayMaterials(Resource):
+    def get(self):
+        materials = db.session.query(Inlays.material).join(Model.inlays).distinct().all()
+        return [m[0] for m in materials if m[0]]
+
+# --- Hardware ---
+
+class TunerModels(Resource):
+    def get(self):
+        models = db.session.query(TuningMachine.model).join(Model.tuning_machine).distinct().all()
+        return [m[0] for m in models if m[0]]
+
+class StringTreeTypes(Resource):
+    def get(self):
+        types = db.session.query(StringTree.model).join(Model.string_tree).distinct().all()
+        return [t[0] for t in types if t[0]]
+
+class HardwareFinishes(Resource):
+    def get(self):
+        finishes = db.session.query(HardwareFinish.label).join(Model.hardware_finish).distinct().all()
+        return [f[0] for f in finishes if f[0]]
+
+class PlasticColors(Resource):
+    def get(self):
+        colors = db.session.query(PlasticColor.label).join(Model.plastic_color).distinct().all()
+        return [c[0] for c in colors if c[0]]
+
+# --- Electronics ---
+
+class PickupTypes(Resource):
+    def get(self):
+        types = db.session.query(GuitarPickup.type).join(Model.pickups).distinct().all()
+        return [t[0] for t in types if t[0]]
+
+class PickupMagnets(Resource):
+    def get(self):
+        magnets = db.session.query(GuitarPickup.magnet).join(Model.pickups).distinct().all()
+        return [m[0] for m in magnets if m[0]]
+
+class PickupCovers(Resource):
+    def get(self):
+        covers = db.session.query(GuitarPickup.cover).join(Model.pickups).distinct().all()
+        return [c[0] for c in covers if c[0]]
+
+class ControlConfigurations(Resource):
+    def get(self):
+        configs = db.session.query(Controls.configuration).join(Model.controls).distinct().all()
+        return [c[0] for c in configs if c[0]]
 
 class IdentificationForm(Resource):
     def get(self):
