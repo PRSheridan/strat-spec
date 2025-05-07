@@ -292,7 +292,6 @@ class Model(db.Model):
             raise ValueError(f"Relic must be one of: {', '.join(valid_options)}")
         return relic
 
-
 class UserGuitar(db.Model):
     __tablename__ = 'user_guitar'
 
@@ -412,7 +411,6 @@ class UserGuitar(db.Model):
         """Returns the model's name if unmodified, otherwise the guitar's name."""
         return self.model.model_name if not self.modified and self.model else self.name or "Unnamed Guitar"
 
-
 # Guitar Attributes
 class GuitarPickup(db.Model):
     __tablename__ = "guitar_pickup"
@@ -457,6 +455,18 @@ class GuitarPickup(db.Model):
             if cover not in valid_covers:
                 raise ValueError(f"Cover must be one of: {', '.join(valid_covers)}")
         return cover
+    
+    @classmethod
+    def get_model_types(cls):
+        return [t[0] for t in db.session.query(cls.type).join(Model.pickups).distinct().all() if t[0]]
+
+    @classmethod
+    def get_model_magnets(cls):
+        return [m[0] for m in db.session.query(cls.magnet).join(Model.pickups).distinct().all() if m[0]]
+
+    @classmethod
+    def get_model_covers(cls):
+        return [c[0] for c in db.session.query(cls.cover).join(Model.pickups).distinct().all() if c[0]]
 
 # Body Model
 class Body(db.Model):
@@ -507,6 +517,14 @@ class Body(db.Model):
             raise ValueError(f"Finish must be one of: {', '.join(valid_finishes)}")
         return finish
 
+    @classmethod
+    def get_model_woods(cls):
+        return [w[0] for w in db.session.query(cls.wood).join(Model.bodies).distinct().all() if w[0]]
+
+    @classmethod
+    def get_model_colors(cls):
+        return [c[0] for c in db.session.query(cls.color).join(Model.bodies).distinct().all() if c[0]]
+
 # Neck Model
 class Neck(db.Model):
     __tablename__ = 'neck'
@@ -543,6 +561,14 @@ class Neck(db.Model):
             if truss_rod not in valid_types:
                 raise ValueError(f"Truss rod location must be one of: {', '.join(valid_types)}")
         return truss_rod
+    
+    @classmethod
+    def get_model_woods(cls):
+        return [w[0] for w in db.session.query(cls.wood).join(Model.neck).distinct().all() if w[0]]
+
+    @classmethod
+    def get_model_shapes(cls):
+        return [s[0] for s in db.session.query(cls.shape).join(Model.neck).distinct().all() if s[0]]
 
 # Headstock Model
 class Headstock(db.Model):
@@ -564,6 +590,14 @@ class Headstock(db.Model):
             if style not in valid_styles:
                 raise ValueError(f"Decal style must be one of: {', '.join(valid_styles)}")
         return style
+    
+    @classmethod
+    def get_model_shapes(cls):
+        return [s[0] for s in db.session.query(cls.shape).join(Model.headstock).distinct().all() if s[0]]
+
+    @classmethod
+    def get_model_decals(cls):
+        return [d[0] for d in db.session.query(cls.decal_style).join(Model.headstock).distinct().all() if d[0]]
 
 # Fretboard Model
 class Fretboard(db.Model):
@@ -605,6 +639,10 @@ class Fretboard(db.Model):
         if not 19 <= count <= 36:
             raise ValueError("Fret count must be between 19 and 36")
         return count
+    
+    @classmethod
+    def get_model_materials(cls):
+        return [m[0] for m in db.session.query(cls.material).join(Model.fretboards).distinct().all() if m[0]]
 
 # Frets Model
 class Frets(db.Model):
@@ -665,6 +703,10 @@ class Nut(db.Model):
             if material not in valid_materials:
                 raise ValueError(f"Nut material must be one of: {', '.join(valid_materials)}")
         return material
+    
+    @classmethod
+    def get_model_materials(cls):
+        return [m[0] for m in db.session.query(cls.material).join(Model.nut).distinct().all() if m[0]]
 
 # Inlays Model
 class Inlays(db.Model):
@@ -705,6 +747,14 @@ class Inlays(db.Model):
             else:
                 return None
         return spacing
+    
+    @classmethod
+    def get_model_shapes(cls):
+        return [s[0] for s in db.session.query(cls.shape).join(Model.inlays).distinct().all() if s[0]]
+
+    @classmethod
+    def get_model_materials(cls):
+        return [m[0] for m in db.session.query(cls.material).join(Model.inlays).distinct().all() if m[0]]
 
 # Bridge Model
 class Bridge(db.Model):
@@ -725,6 +775,10 @@ class Bridge(db.Model):
         if not 2 <= screws <= 6:
             raise ValueError("Bridge screw count must be between 2 and 6")
         return screws
+    
+    @classmethod
+    def get_model_models(cls):
+        return [m[0] for m in db.session.query(cls.model).join(Model.bridge).distinct().all() if m[0]]
 
 # Saddles Model
 class Saddles(db.Model):
@@ -752,7 +806,15 @@ class Saddles(db.Model):
             if material not in valid_materials:
                 raise ValueError(f"Saddle material must be one of: {', '.join(valid_materials)}")
         return material
+    
+    @classmethod
+    def get_model_styles(cls):
+        return [s[0] for s in db.session.query(cls.style).join(Model.saddles).distinct().all() if s[0]]
 
+    @classmethod
+    def get_model_materials(cls):
+        return [m[0] for m in db.session.query(cls.material).join(Model.saddles).distinct().all() if m[0]]
+    
 # Switch Model
 class Switch(db.Model):
     __tablename__ = 'switch'
@@ -781,6 +843,10 @@ class Controls(db.Model):
     models = db.relationship('Model', secondary='model_controls', back_populates='controls')
     user_guitars = db.relationship('UserGuitar', back_populates='controls')
 
+    @classmethod
+    def get_model_configurations(cls):
+        return [c[0] for c in db.session.query(cls.configuration).join(Model.controls).distinct().all() if c[0]]
+
 # Tuning Machine Model
 class TuningMachine(db.Model):
     __tablename__ = 'tuning_machine'
@@ -801,6 +867,10 @@ class TuningMachine(db.Model):
             if model not in valid_models:
                 raise ValueError(f"Tuning machine model must be one of: {', '.join(valid_models)}")
         return model
+    
+    @classmethod
+    def get_model_models(cls):
+        return [m[0] for m in db.session.query(cls.model).join(Model.tuning_machine).distinct().all() if m[0]]
 
 # String Tree Model
 class StringTree(db.Model):
@@ -827,6 +897,10 @@ class StringTree(db.Model):
             if model not in valid_models:
                 raise ValueError(f"String tree model must be one of: {', '.join(valid_models)}")
         return model
+    
+    @classmethod
+    def get_model_types(cls):
+        return [t[0] for t in db.session.query(cls.model).join(Model.string_tree).distinct().all() if t[0]]
 
 # Neck Plate Model
 class NeckPlate(db.Model):
@@ -901,6 +975,10 @@ class HardwareFinish(db.Model):
             raise ValueError(f"'{value}' is not a recognized hardware finish")
         return value
     
+    @classmethod
+    def get_model_labels(cls):
+        return [l[0] for l in db.session.query(cls.label).join(Model.hardware_finish).distinct().all() if l[0]]
+
 class PlasticColor(db.Model):
     __tablename__ = 'plastic_color'
 
@@ -915,3 +993,8 @@ class PlasticColor(db.Model):
         if value not in ['White', 'Black', 'Parchment', 'Mint Green', 'Aged White', 'Cream', 'Pearloid', 'Tortoiseshell', 'Anodized Gold', 'Gray', 'Other']:
             raise ValueError(f"'{value}' is not a recognized plastic color")
         return value
+        
+    @classmethod
+    def get_model_labels(cls):
+        return [l[0] for l in db.session.query(cls.label).join(Model.plastic_color).distinct().all() if l[0]]
+

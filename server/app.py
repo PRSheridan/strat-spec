@@ -6,8 +6,8 @@ from marshmallow import ValidationError
 from sqlalchemy.sql.expression import func
 
 from config import app, db, api
-from models import User, Image, UserGuitar, Model, Body, Bridge, Saddle, Neck, Headstock, \
-    Fretboard, Nut, Inlays, TuningMachine, StringTree, GuitarPickup, Controls
+from models import User, Image, UserGuitar, Model, Body, Bridge, Saddles, Neck, Headstock, \
+    Fretboard, Nut, Inlays, TuningMachine, StringTree, GuitarPickup, Controls, HardwareFinish, PlasticColor
 
 from schemas import UserSchema, UserGuitarSchema, ModelSchema
 
@@ -402,6 +402,8 @@ api.add_resource(IdentificationForm, '/api/identification-form')
 api.add_resource(Countries, '/api/countries')
 api.add_resource(SerialNumberLocations, '/api/serial-number-locations')
 api.add_resource(Brands, '/api/brands')
+
+api.add_resource(PickupCovers, '/api/pickup_covers')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
