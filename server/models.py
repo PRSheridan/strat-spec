@@ -195,6 +195,7 @@ class Model(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     brand = db.Column(db.String(100), nullable=False)
     model_name = db.Column(db.String(100), nullable=False)
+    serial_number_location = db.Column(db.String(50), nullable=False)
     year_range = db.Column(db.String(20), nullable=False)
     country = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String, nullable=True)

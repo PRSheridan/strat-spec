@@ -1,12 +1,16 @@
 Draft
 
-An application for searching for and identifying Stratocaster models. 
+An application for cataloging searching for and identifying Stratocaster models. 
 
 install dependencies
 
 bun run dev
 pipenv shell && cd server
 python app.py
+
+OR
+
+./start.sh
 
 ### **Guitar Catalog & Models System**
 

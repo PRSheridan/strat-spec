@@ -223,12 +223,12 @@ class BridgeModels(Resource):
 
 class SaddleStyles(Resource):
     def get(self):
-        styles = db.session.query(Saddle.style).join(Model.saddles).distinct().all()
+        styles = db.session.query(Saddles.style).join(Model.saddles).distinct().all()
         return [s[0] for s in styles if s[0]]
 
 class SaddleMaterials(Resource):
     def get(self):
-        materials = db.session.query(Saddle.material).join(Model.saddles).distinct().all()
+        materials = db.session.query(Saddles.material).join(Model.saddles).distinct().all()
         return [m[0] for m in materials if m[0]]
 
 # --- Neck & Headstock ---
@@ -325,8 +325,6 @@ class IdentificationForm(Resource):
       location_list = SerialNumberLocations.get(self)
       country_list = Countries.get(self)
 
-      print(country_list[0])
-
       return {
           "brands": brand_list[0],
           "serial_number_locations": location_list[0],
@@ -336,57 +334,44 @@ class IdentificationForm(Resource):
 
 class PhysicalForm(Resource):
     def get(self):
-        #plastic color
-        #hardware color
-        pass
+        return {
+            "plastic_colors": PlasticColor.get_model_labels(),
+            "hardware_finishes": HardwareFinish.get_model_labels()
+        }, 200
 
 class BodyForm(Resource):
-    #body wood
-    #body color
-    #bridge model
-    #saddle style
-    #saddle material
-    pass
+    def get(self):
+        return {
+            "body_woods": Body.get_model_woods(),
+            "body_colors": Body.get_model_colors(),
+            "bridge_models": Bridge.get_model_models(),
+            "saddle_styles": Saddles.get_model_styles(),
+            "saddle_materials": Saddles.get_model_materials()
+        }, 200
 
 class NeckForm(Resource):
-    # neck wood
-    # neck shape
-    # headstock shape
-    # headstock decal
-    # fretboard material
-    # nut material
-    # inlay shape
-    # inlay material
-    # tuner model
-    # string tree type
-    pass
+    def get(self):
+        return {
+            "neck_woods": Neck.get_model_woods(),
+            "neck_shapes": Neck.get_model_shapes(),
+            "headstock_shapes": Headstock.get_model_shapes(),
+            "headstock_decals": Headstock.get_model_decals(),
+            "fretboard_materials": Fretboard.get_model_materials(),
+            "nut_materials": Nut.get_model_materials(),
+            "inlay_shapes": Inlays.get_model_shapes(),
+            "inlay_materials": Inlays.get_model_materials(),
+            "tuner_models": TuningMachine.get_model_models(),
+            "string_tree_types": StringTree.get_model_types()
+        }, 200
 
 class ElectronicsForm(Resource):
-    # pickup type
-    # pickup magnet
-    # pickup cover
-    # control configuration
-    pass
-
-
-#specific guitar parts for GuitarForm to be replaced by form page specific requests
-class Countries(Resource):
     def get(self):
-        countries = db.session.query(UserGuitar.country).distinct().all()
-        country_list = [country[0] for country in countries]  # Extract values from tuples
-        return country_list, 200
-    
-class SerialNumberLocations(Resource):
-    def get(self):
-        locations = db.session.query(UserGuitar.serial_number_location).distinct().all()
-        location_list = [location[0] for location in locations]  # Extract values from tuples
-        return location_list, 200
-    
-class Brands(Resource):
-    def get(self):
-        brands = db.session.query(UserGuitar.brand).distinct().all()
-        brand_list = [brand[0] for brand in brands]  # Extract values from tuples
-        return brand_list, 200
+        return {
+            "pickup_types": GuitarPickup.get_model_types(),
+            "pickup_magnets": GuitarPickup.get_model_magnets(),
+            "pickup_covers": GuitarPickup.get_model_covers(),
+            "control_configurations": Controls.get_model_configurations()
+        }, 200
 
 api.add_resource(CheckSession, '/api/check_session')
 api.add_resource(Signup, '/api/signup')
@@ -398,18 +383,15 @@ api.add_resource(Guitars, '/api/guitars')
 api.add_resource(GuitarBySN, '/api/guitar/<string:serial_number>')
 api.add_resource(Models, '/api/models')
 api.add_resource(ModelByName, '/api/model/<string:model_name>')
-api.add_resource(IdentificationForm, '/api/identification-form')
-api.add_resource(Countries, '/api/countries')
-api.add_resource(SerialNumberLocations, '/api/serial-number-locations')
-api.add_resource(Brands, '/api/brands')
 
-api.add_resource(PickupCovers, '/api/pickup_covers')
+api.add_resource(IdentificationForm, '/api/identification-form')
+api.add_resource(PhysicalForm, '/api/physical-form')
+api.add_resource(BodyForm, '/api/body-form')
+api.add_resource(NeckForm, '/api/neck-form')
+api.add_resource(ElectronicsForm, '/api/electronics-form')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
-
-  #rework all resources. groups for specific form pages calling individual functions
-
 
 
 
