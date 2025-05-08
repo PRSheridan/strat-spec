@@ -54,10 +54,9 @@ function StepIdentification({ onNext }: StepIdentificationProps) {
     fetch("/api/identification-form")
       .then(res => res.json())
       .then(data => {
-        console.log(data.brands)
         setBrandOptions(data.brands)
-        setLocationOptions(data.serial_number_locations)
         setCountryOptions(data.countries)
+        setLocationOptions(data.serial_number_locations)
       })
     fetch("/api/models")
       .then(res => res.json())

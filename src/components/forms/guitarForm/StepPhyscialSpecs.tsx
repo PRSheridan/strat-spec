@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -28,6 +28,19 @@ interface StepPhysicalSpecsProps {
 }
 
 function StepPhysicalSpecs({ onNext }: StepPhysicalSpecsProps) {
+  const [colorOptions, setColorOptions] = useState<string[]>([])
+  const [finishOptions, setFinishOptions] = useState<string[]>([])
+
+  useEffect(() => {
+    fetch("/api/physical-form")
+      .then(res => res.json())
+      .then(data => {
+        console.log(data)
+        setColorOptions(data.plastic_colors)
+        setFinishOptions(data.hardware_finishes)
+      })
+  }, [])
+
   const { register, handleSubmit, formState: { errors } } = useForm<PhysicalSpecsData>({
     resolver: zodResolver(physicalSpecsSchema),
     defaultValues: {

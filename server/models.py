@@ -292,6 +292,19 @@ class Model(db.Model):
         if relic not in valid_options:
             raise ValueError(f"Relic must be one of: {', '.join(valid_options)}")
         return relic
+    
+    @classmethod
+    def get_model_brands(cls):
+        return [b[0] for b in db.session.query(cls.brand).distinct().all() if b[0]]
+
+    @classmethod
+    def get_model_serial_number_locations(cls):
+        return [l[0] for l in db.session.query(cls.serial_number_location).distinct().all() if l[0]]
+
+    @classmethod
+    def get_model_countries(cls):
+        return [c[0] for c in db.session.query(cls.country).distinct().all() if c[0]]
+
 
 class UserGuitar(db.Model):
     __tablename__ = 'user_guitar'
